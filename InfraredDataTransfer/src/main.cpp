@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "Timers/CTCTimer.hpp"
 #include <string.h>
+#include "IR_Parts/IRTransmitter.hpp"
 void setup() {
   // put your setup code here, to run once:
 // TCCR1B  = 0b00001001;
@@ -17,19 +18,16 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  CTCTimer a = CTCTimer(1,17000);
-    char text[100];
-    snprintf(text,100,"CMP %lu, freq %lu, prescale %i ",a.OCRn, a.runningFreq, a.prescale);
-  // char bits[100];
-  // snprintf(bits,100,"WGM0 = %i, WGM1 = %i, WGM2 = %i,WGM3 = %i, Com0 = %i, Com1 = %i, CS0 = %i, CS1 = %i, CS2 = %i",a.WGM0,a.WGM1,a.WGM2,a.WGM3,a.COMnX0,a.COMnX1,a.CSn0,a.CSn1,a.CSn2);
+ BaseTimer* a = new CTCTimer(1,10000);
+  uint8_t data[1]={1};
+  IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
+  char c[100];
+  snprintf(c,100,"Running freq: %lf\n\r",((double)(1/a->getRunningFreq())));
   while(1){
-    /* code */
-    a.togglePwm(ON);
-    delay(5000);
-    a.togglePwm(OFF);
-    delay(5000);
-    digitalWrite(11,0);
-    Serial.write(text);
+    b.sendData(data,1);
+    _delay_ms(1000);
+    
+    Serial.write(c);
   }
   
 }

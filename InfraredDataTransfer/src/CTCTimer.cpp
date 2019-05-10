@@ -5,7 +5,6 @@ CTCTimer::CTCTimer(int timer, uint32_t freq)
     int setupA,setupB;
     runningFreq = freq;
     ActiveTimer=timer;
-    
     if (timer==0) {
         possiblePrescalers = new int[5]{1,8,64,256,1024};
         prescale    = calculatePrescale(freq,timer);
@@ -180,6 +179,10 @@ void CTCTimer::togglePwm(PWM_COMMAND onOff){
         default:
             break;
     }
+}
+uint32_t CTCTimer::getRunningFreq()
+{
+    return runningFreq;
 }
 CTCTimer::~CTCTimer()
 {

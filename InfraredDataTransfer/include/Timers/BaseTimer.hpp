@@ -6,8 +6,6 @@ enum PWM_COMMAND{
 class BaseTimer
 {
     protected:
-
-    public:
     int ActiveTimer;
     uint32_t runningFreq;
     int prescale;
@@ -16,7 +14,8 @@ class BaseTimer
     int COMnX0,COMnX1;
     int CSn0,CSn1,CSn2;
     uint32_t OCRn;
-    virtual void turnPwm(PWM_COMMAND onOff);
-    virtual void setPwmTo(int pwm);
-    virtual int calculatePrescale(int freq);
+    virtual int calculatePrescale(uint32_t desiredFrequency,int timer);
+    public:
+    virtual void togglePwm(PWM_COMMAND onOff);
+    virtual uint32_t getRunningFreq();
 };

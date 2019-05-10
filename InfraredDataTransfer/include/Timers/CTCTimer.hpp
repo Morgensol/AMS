@@ -5,10 +5,12 @@
 
 class CTCTimer : public BaseTimer
 {
+private:
+    int calculatePrescale(uint32_t desiredFrequency,int timer);
 public:
     CTCTimer(int timer, uint32_t freq);
     ~CTCTimer();
     void togglePwm(PWM_COMMAND onOff);
-    int calculatePrescale(uint32_t desiredFrequency,int timer);
+    uint32_t getRunningFreq();
 };
 
