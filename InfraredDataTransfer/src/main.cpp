@@ -1,7 +1,7 @@
 #include <Arduino.h>
-#include "Timers/CTCTimer.hpp"
+#include "CTCTimer.hpp"
 #include <string.h>
-#include "IR_Parts/IRTransmitter.hpp"
+#include "IRTransmitter.hpp"
 #include "myDelay.hpp"
 void setup() {
   // put your setup code here, to run once:

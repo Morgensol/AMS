@@ -11,7 +11,6 @@ void setup(){
     UNITY_BEGIN();
 }
 void loop(){
-    RUN_TEST(test_asd);
-    RUN_TEST(newtestasd);
+    RUN_TEST(InputIs1234_ChecksumIs10);
     UNITY_END();
 }

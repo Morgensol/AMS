@@ -13,4 +13,3 @@ public:
     void togglePwm(PWM_COMMAND onOff);
     uint32_t getRunningFreq();
 };
-

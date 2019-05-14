@@ -1,4 +1,4 @@
-#include "IR_Parts/IRTransmitter.hpp"
+#include "IRTransmitter.hpp"
 
 IRTransmitter::IRTransmitter(BaseEncoder *encoder, BaseTimer *timer)
 {

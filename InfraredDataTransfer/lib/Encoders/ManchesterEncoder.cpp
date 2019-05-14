@@ -1,6 +1,10 @@
-#include "Encoders/ManchesterEncoder.hpp"
+#include "ManchesterEncoder.hpp"
 
 ManchesterEncoder::ManchesterEncoder()
+{
+
+}
+ManchesterEncoder::~ManchesterEncoder()
 {
 
 }
@@ -32,6 +36,16 @@ void ManchesterEncoder::EncodeData(uint8_t* data, uint16_t* EncodedData,uint32_t
     {
         EncodedData[i]=EncodeBit(packedData[i]);
     }
+}
+
+uint32_t ManchesterEncoder::generateChecksum(uint8_t* data,uint32_t length)
+{
+    uint32_t retData=0;
+    for (size_t i = 0; i < length; i++)
+    {
+        retData+=data[i];
+    }
+    return retData;
 }
 void ManchesterEncoder::AddChecksumAndLength(uint8_t* data, uint32_t length, uint8_t* returnData)
 {

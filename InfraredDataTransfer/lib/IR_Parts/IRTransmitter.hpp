@@ -1,5 +1,5 @@
-#include "Encoders/ManchesterEncoder.hpp"
-#include "Timers/CTCTimer.hpp"
+#include "ManchesterEncoder.hpp"
+#include "CTCTimer.hpp"
 #include "myDelay.hpp"
 class IRTransmitter
 {
