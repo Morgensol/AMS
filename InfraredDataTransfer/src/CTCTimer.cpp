@@ -123,57 +123,57 @@ void CTCTimer::togglePwm(PWM_COMMAND onOff){
         case 0:
             if (onOff==OFF)
             {
-                TCCR0B&=TCCR0B & !(1<<CS00);
-                digitalWrite(13,0);
+                TCCR0A&=~((1<<COM0A1)|(1<<COM0A0));
+                digitalWrite(13,LOW);
             }
             else{
-                TCCR0B|=TCCR0B & (1<<CS00);
+                TCCR0B|=(1<<COM0A0);
             }
             
             break;
         case 1:
             if (onOff==OFF){
-                TCCR1B&= ~(1<<CS10);
-                digitalWrite(11,0);
+                TCCR1A&= ~((1<<COM1A1)|(1<<COM1A0));
+                digitalWrite(11,LOW);
             }
             else{
-                TCCR1B|=(1<<CS10);
+                TCCR1A|=(1<<COM1A0);
             }
             break;
         case 2:
             if (onOff==OFF){
-                TCCR2B&=~(1<<CS20);
-                digitalWrite(10,0);
+                TCCR2A&=~((1<<COM2A1)|(1<<COM2A0));
+                digitalWrite(10,LOW);
             }
             else{
-                TCCR2B|=(1<<CS20);
+                TCCR2A|=(1<<COM2A0);
             }
             break;
         case 3:
             if (onOff==OFF){
-                TCCR3B&=~(1<<CS30);
-                digitalWrite(5,0);
+                TCCR3A&=~((1<<COM3A1)|(1<<COM3A0));
+                digitalWrite(5,LOW);
             }
             else{
-                TCCR3B|=(1<<CS30);
+                TCCR3A|=(1<<COM3A0);
             }
             break;
         case 4:
             if (onOff==OFF){
-                TCCR4B&=~(1<<CS40);
-                digitalWrite(6,0);
+                TCCR4A&=~((1<<COM4A1)|(1<<COM4A0));
+                digitalWrite(6,LOW);
             }
             else{
-                TCCR4B|=(1<<CS40);
+                TCCR4A|=(1<<COM4A0);
             }
             break;
         case 5:
             if (onOff==OFF){
-                TCCR5B&=~(1<<CS50);
-                digitalWrite(38,0);
+                TCCR5A&=~((1<<COM5A1)|(1<<COM5A0));
+                digitalWrite(38,LOW);
             }
             else{
-                TCCR5B|=(1<<CS50);
+                TCCR5A|=(1<<COM5A0);
             }
             break;
         default:

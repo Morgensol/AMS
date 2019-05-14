@@ -2,6 +2,7 @@
 #include "Timers/CTCTimer.hpp"
 #include <string.h>
 #include "IR_Parts/IRTransmitter.hpp"
+#include "myDelay.hpp"
 void setup() {
   // put your setup code here, to run once:
 // TCCR1B  = 0b00001001;
@@ -18,14 +19,14 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
- BaseTimer* a = new CTCTimer(1,10000);
+ BaseTimer* a = new CTCTimer(1,1000);
   uint8_t data[1]={1};
   IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
   char c[100];
-  snprintf(c,100,"Running freq: %lf\n\r",((double)(1/a->getRunningFreq())));
+
   while(1){
     b.sendData(data,1);
-    _delay_ms(1000);
+    _delay_ms(500);
     
     Serial.write(c);
   }
