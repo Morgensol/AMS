@@ -1,3 +1,5 @@
+#ifndef IRTRANSMITTER_H
+#define IRTRANSMITTER_H
 #include "ManchesterEncoder.hpp"
 #include "CTCTimer.hpp"
 #include "myDelay.hpp"
@@ -12,4 +14,5 @@ public:
     ~IRTransmitter();
     void sendData(uint8_t* Data,uint32_t length);
 };
+#endif
 

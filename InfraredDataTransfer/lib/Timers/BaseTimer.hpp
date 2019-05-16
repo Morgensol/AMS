@@ -1,3 +1,5 @@
+#ifndef BASETIMER_H
+#define BASETIMER_H
 #include <stdint.h>
 enum PWM_COMMAND{
     ON,
@@ -19,3 +21,4 @@ class BaseTimer
     virtual void togglePwm(PWM_COMMAND onOff);
     virtual uint32_t getRunningFreq();
 };
+#endif

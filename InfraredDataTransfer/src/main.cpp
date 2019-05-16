@@ -20,12 +20,12 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
  BaseTimer* a = new CTCTimer(1,1000);
-  uint8_t data[1]={1};
+  uint8_t data[]={1,2};
   IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
   char c[100];
 
   while(1){
-    b.sendData(data,1);
+    b.sendData(data,2);
     _delay_ms(500);
     
     Serial.write(c);

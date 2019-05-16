@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTCTIMER_H
+#define CTCTIMER_H
 #include <Arduino.h>
 #include "BaseTimer.hpp"
 #include <stdio.h>
@@ -13,3 +14,4 @@ public:
     void togglePwm(PWM_COMMAND onOff);
     uint32_t getRunningFreq();
 };
+#endif
