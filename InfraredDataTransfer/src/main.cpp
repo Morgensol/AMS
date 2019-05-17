@@ -3,6 +3,7 @@
 #include <string.h>
 #include "IRTransmitter.hpp"
 #include "myDelay.hpp"
+#include "ManchesterDecoder.hpp"
 void setup() {
   // put your setup code here, to run once:
 // TCCR1B  = 0b00001001;

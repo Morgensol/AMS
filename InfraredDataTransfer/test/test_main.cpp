@@ -3,7 +3,7 @@
 
 #include "test_ManchesterEncoder.hpp"
 #include "test_IRTransmitter.hpp"
-
+#include "test_ManchesterDecoder.hpp"
 void setup(){
     UNITY_BEGIN();
 }
@@ -12,5 +12,8 @@ void loop(){
     _delay_ms(500);
     RUN_TEST(InputIs1_Outputs1InManchesterCode);
     _delay_ms(500);
+    RUN_TEST(inputIsEncoded_OutputIs1);
+    _delay_ms(500);
+    RUN_TEST(asdasd);
     UNITY_END();
 }
