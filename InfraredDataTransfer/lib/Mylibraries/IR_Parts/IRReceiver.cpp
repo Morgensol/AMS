@@ -1,38 +1,38 @@
 #include "IRReceiver.hpp"
 #include "avr/interrupt.h"
 
-#define NOP __asm__ __volatile__ ("nop\n\t")
-
 volatile bool trig = false;
 unsigned long timestamp[3];
 volatile uint8_t buffcnt = 0; 
-int counter = 0;
+uint8_t counter = 0;
 unsigned long T = 0;
 unsigned long current;
 unsigned long previous;
-volatile uint8_t buff;
+volatile uint8_t buff = 0;
 
 ISR(INT0_vect)
 {
-    if((PIND&(1<<PIND0)) and (!trig))
+    if(!trig)
     {
         timestamp[counter++] = micros(); 
-    } 
+    }
+
     if(counter ==3 and !trig)
     {
-        unsigned long delta1 = timestamp[1]-timestamp[0];
-        unsigned long delta2 = timestamp[2]-timestamp[1];
+        unsigned long treT = timestamp[1]-timestamp[0];
+        T = timestamp[2]-timestamp[1];
         // char c[100];
-        // snprintf(c,100,"delta1: %lu delta2: %lu timestamp1: %lu timestamp2: %lu timestamp3: %lu",delta1,delta2, timestamp[0],timestamp[1], timestamp[2]);
+        // snprintf(c,100,"T: %lu treT: %lu timestamp1: %lu timestamp2: %lu timestamp3: %lu",T,treT, timestamp[0],timestamp[1], timestamp[2]);
         // Serial.write(c);
-        if((double)delta2 > 0.90f*(double)delta1 && 1.10f*(double)delta1 > (double)delta2){
+        if((double)T*3>(double)treT*0.85 && (double)treT*1.15>(double)T*3){
             trig = true; 
-            T = (delta1+delta2)/2;
+            T = (T+treT)>>1;
             previous = timestamp[2];
             counter = 0;
         }
         else{
             counter = 0;
+            Serial.write('G');
         }
     }
 
@@ -99,15 +99,10 @@ IRReceiver::~IRReceiver(){
 void IRReceiver::Receive(){
     while(!trig)
     { 
-    }
-    cli();
-    EICRA = 0b00000001;
-    sei();
-        
-    int checksum[4];
+    }   
+    uint8_t checksum[4];
     uint8_t length[4];
     volatile uint8_t lengthCheck = 0;
-
     while (lengthCheck<4)
     {
         if(buffcnt == 8){
@@ -119,7 +114,6 @@ void IRReceiver::Receive(){
     }
 
     lengthCheck = 0;
-
     while (lengthCheck<4)
     {
         if(buffcnt == 8){
@@ -133,9 +127,17 @@ void IRReceiver::Receive(){
     uint32_t arrayLen=0;
     arrayLen=length[0]+((uint32_t)length[1]<<8)+((uint32_t)length[2]<<16)+((uint32_t)length[3]<<24);
 
+
+
     char d[100];
     snprintf(d, 100, "Length %lu" ,arrayLen);
     Serial.write(d);
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        snprintf(d, 100, "length[%i] = 0x%x", i, length[i]);
+        Serial.write(d);
+    }
 
     uint8_t array[arrayLen];
     uint8_t index = 0;
@@ -149,13 +151,14 @@ void IRReceiver::Receive(){
         }
         if(index == arrayLen){
             trig = false;
-            cli();
-            EICRA = 0b00000011;
-            sei();
         }
     }
-    snprintf(d, 100, "array[0] = 0x%x array[1] = 0x%x", array[0], array[1]);
-    Serial.write(d);
+
+    for (size_t i = 0; i < arrayLen; i++)
+    {
+        snprintf(d, 100, "array[%i] = 0x%x", i, array[i]);
+        Serial.write(d);
+    }
 }
 
 void IRReceiver::setFrequence(int val){
@@ -168,7 +171,7 @@ int IRReceiver::getFrequence(){
 
 void IRReceiver::setupInterrupt(int inter){
     if(inter == 0){
-        EICRA = 0b00000011;
+        EICRA = 0b00000001;
         EIMSK |= 0b00000001;
     }
     else if(inter == 1){
