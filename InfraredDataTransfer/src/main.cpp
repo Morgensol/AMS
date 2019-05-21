@@ -4,6 +4,7 @@
 #include "IRTransmitter.hpp"
 #include "myDelay.hpp"
 #include "ManchesterDecoder.hpp"
+#include "IRReceiver.hpp"
 void setup() {
   // put your setup code here, to run once:
 // TCCR1B  = 0b00001001;
@@ -38,6 +39,17 @@ void loop() {
     _delay_ms(500);
     
     //Serial.write(c);
+//  BaseTimer* a = new CTCTimer(1,1000);
+//   uint8_t data[]={1,2};
+//   IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
+//   char c[100];
+    IRReceiver a = IRReceiver(0, true);
+
+  while(1){
+    // b.sendData(data,2);
+    // _delay_ms(500);
+    a.Receive();
+    // Serial.write(c);
   }
   
 }
