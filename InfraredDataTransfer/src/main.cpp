@@ -20,16 +20,24 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
- BaseTimer* a = new CTCTimer(1,1000);
-  uint8_t data[]={1,2};
+ BaseTimer* a = new CTCTimer(1,38000);
+ a->togglePwm(OFF);
+  uint8_t data[1024];
+  for (int i = 0; i < 1024; ++i){
+  data[i] = 1;
+  }
   IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
   char c[100];
 
   while(1){
-    b.sendData(data,2);
+    if(Serial.read()=='s')
+    {
+    Serial.write('p');
+    b.sendData(data,1);
+    }
     _delay_ms(500);
     
-    Serial.write(c);
+    //Serial.write(c);
   }
   
 }
