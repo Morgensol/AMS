@@ -47,6 +47,11 @@ ISR(INT0_vect)
             previous = current;
             buffcnt++;
         }
+        else if((double)current-(double)previous > 2.0f*(double)T)
+        {
+            trig = false;
+            Serial.write('f');
+        }
     }
 }
 
@@ -150,13 +155,13 @@ void IRReceiver::Receive(){
     arrayChecksum=checksum[0]+((uint32_t)checksum[1]<<8)+((uint32_t)checksum[2]<<16)+((uint32_t)checksum[3]<<24);
 
     char d[100];
-    snprintf(d, 100, "Length %lu" ,arrayLen);
+    snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
     Serial.write(d);
-    snprintf(d, 100, "Checksum %lu" ,arrayChecksum);
+    snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
     Serial.write(d);
-    snprintf(d, 100, "CmpChecksum %lu" ,Cmpchecksum);
+    snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
     Serial.write(d);
-    snprintf(d, 100, "Array[0] %c" ,array[0]);
+    snprintf(d, 100, "Array[0] =  %u \n\r" ,array[0]);
     Serial.write(d);
 }
 
