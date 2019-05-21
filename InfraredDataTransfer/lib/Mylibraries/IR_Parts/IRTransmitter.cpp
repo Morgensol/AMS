@@ -16,12 +16,13 @@ void IRTransmitter::sendByte(uint8_t byte) //LSB & Little-Endian
         if(byte&(1<<i))
         {
             _timer->togglePwm(ON);
-            usleep(((1000ul*1000ul)/_timer->getRunningFreq())*10);
-            _timer->togglePwm(OFF);
+            usleep(((1000ul*1000ul)/(_timer->getRunningFreq()*2))*10);
         }
         else
         {
-            usleep(((1000ul*1000ul)/_timer->getRunningFreq())*10);
+            _timer->togglePwm(OFF);
+            usleep(((1000ul*1000ul)/(_timer->getRunningFreq()*2))*10);
+            _timer->togglePwm(OFF);
         }
         
     }
@@ -31,10 +32,6 @@ void IRTransmitter::sendData(uint8_t* Data,uint32_t length)
 {
     //First 8 bytes with checksum and length
     uint8_t ChecksumAndLength[8];
-
-    //Output arrays for Data and checksum+length
-    uint16_t encodedData[length];
-    uint16_t encodedChecksumAndLength[8];
 
     //Adding Checksum to Array
     uint32_t checksum=_encoder->generateChecksum(Data,length);
@@ -48,19 +45,19 @@ void IRTransmitter::sendData(uint8_t* Data,uint32_t length)
     ChecksumAndLength[5]=(length&0xff00)>>8;
     ChecksumAndLength[6]=(length&0xff0000)>>16;
     ChecksumAndLength[7]=(length&0xff000000)>>24;
-    _encoder->EncodeData(ChecksumAndLength,encodedChecksumAndLength,8);
-    _encoder->EncodeData(Data,encodedData,length);
     //Initiating write
-    sendByte(0b11100000);
+    sendByte(0b10111000);
     for (size_t i = 0; i < 8; i++)
     {
-        sendByte((uint8_t)encodedChecksumAndLength[i]&0xFF);
-        sendByte((uint8_t)((encodedChecksumAndLength[i]&0xFF00)>>8));
+        sendByte((uint8_t)_encoder->EncodeBit(ChecksumAndLength[i])&0xFF);
+        sendByte((uint8_t)((_encoder->EncodeBit(ChecksumAndLength[i])&0xFF00)>>8));
     }
     for (size_t i = 0; i < length; i++)
     {
-        sendByte((uint8_t)encodedData[i]&0xFF);
-        sendByte((uint8_t)((encodedData[i]&0xFF00)>>8));
+        sendByte((uint8_t)_encoder->EncodeBit(Data[i])&0xFF);
+        sendByte((uint8_t)((_encoder->EncodeBit(Data[i])&0xFF00)>>8));
+        
     }
+    sendByte(0);
     
 }
