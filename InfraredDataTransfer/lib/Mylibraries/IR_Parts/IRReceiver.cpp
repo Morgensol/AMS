@@ -38,7 +38,7 @@ ISR(INT0_vect)
 
     if(trig){
         current = micros();
-        if((double)current-(double)previous > 0.6f*(double)T)
+        if((double)current-(double)previous > 0.80f*(double)T && 1.20f*(double)T > (double)current-(double)previous)
         {
             if((PIND&(1<<PIND0)))
             {
@@ -46,6 +46,11 @@ ISR(INT0_vect)
             }
             previous = current;
             buffcnt++;
+        }
+        else if((double)current-(double)previous > 2.0f*(double)T)
+        {
+            trig = false;
+            Serial.write('f');
         }
     }
 }
@@ -127,24 +132,16 @@ void IRReceiver::Receive(){
     uint32_t arrayLen=0;
     arrayLen=length[0]+((uint32_t)length[1]<<8)+((uint32_t)length[2]<<16)+((uint32_t)length[3]<<24);
 
+    
 
-
-    char d[100];
-    snprintf(d, 100, "Length %lu" ,arrayLen);
-    Serial.write(d);
-
-    for (size_t i = 0; i < 4; i++)
-    {
-        snprintf(d, 100, "length[%i] = 0x%x", i, length[i]);
-        Serial.write(d);
-    }
-
-    uint8_t array[arrayLen];
-    uint8_t index = 0;
+    volatile uint8_t array[arrayLen];
+    volatile uint32_t index = 0;
+    uint32_t Cmpchecksum =0;
     while(trig){
         if(buffcnt == 8)
         {
             array[index]=buff;
+            Cmpchecksum += array[index];
             index++;
             buffcnt = 0;
             buff = 0;
@@ -154,11 +151,18 @@ void IRReceiver::Receive(){
         }
     }
 
-    for (size_t i = 0; i < arrayLen; i++)
-    {
-        snprintf(d, 100, "array[%i] = 0x%x", i, array[i]);
-        Serial.write(d);
-    }
+    uint32_t arrayChecksum=0;
+    arrayChecksum=checksum[0]+((uint32_t)checksum[1]<<8)+((uint32_t)checksum[2]<<16)+((uint32_t)checksum[3]<<24);
+
+    char d[100];
+    snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
+    Serial.write(d);
+    snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
+    Serial.write(d);
+    snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
+    Serial.write(d);
+    snprintf(d, 100, "Array[0] =  %u \n\r" ,array[0]);
+    Serial.write(d);
 }
 
 void IRReceiver::setFrequence(int val){
