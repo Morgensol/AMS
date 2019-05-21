@@ -83,6 +83,7 @@ CTCTimer::CTCTimer(int timer, uint32_t freq)
             break;
 
     }
+    togglePwm(OFF);
 }
 
 int CTCTimer::calculatePrescale(uint32_t desiredFrequency,int timer)

@@ -5,51 +5,36 @@
 #include "myDelay.hpp"
 #include "ManchesterDecoder.hpp"
 #include "IRReceiver.hpp"
+#define SENDER
 void setup() {
   // put your setup code here, to run once:
-// TCCR1B  = 0b00001001;
-// TCCR1A  = 0b01000000;
-// OCR1A    = 665;
-  // 	TCCR1B = (1 << WGM12); // Configure timer 1 for CTC mode 
-	// TCCR1A = (1 << COM1A0); // Enable timer 1 Compare Output channel A in toggle mode 
-	// OCR1A   = 124; // Set CTC compare value to 1KHz at 16MHz AVR clock, with a prescaler of 64 
-	// TCCR1B |= ((1 << CS10) | (1 << CS11)); // Start timer at Fcpu/64 
-  
   Serial.begin(9600);
-
+  Serial.setTimeout(10000);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
- BaseTimer* a = new CTCTimer(1,38000);
- a->togglePwm(OFF);
-  uint8_t data[1024];
-  for (int i = 0; i < 1024; ++i){
-  data[i] = 1;
-  }
-  IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
-  char c[100];
-
+    #ifdef SENDER
+    BaseTimer* a = new CTCTimer(1,38000);
+    IRTransmitter transmitter = IRTransmitter(new ManchesterEncoder(),a);
+    uint8_t data[1024];
+    uint32_t length=0;
+    #elif RECIEVER
+    IRReceiver reciever = IRReceiver(0, true);
+    #endif
   while(1){
-    if(Serial.read()=='s')
-    {
-    Serial.write('p');
-    b.sendData(data,1);
+    #ifdef SENDER
+    Serial.write("Enter Message and press enter to send: \n\r");
+    do{
+      length = Serial.readBytesUntil('\n',data,1024);
     }
-    _delay_ms(500);
-    
-    //Serial.write(c);
-//  BaseTimer* a = new CTCTimer(1,1000);
-//   uint8_t data[]={1,2};
-//   IRTransmitter b = IRTransmitter(new ManchesterEncoder(),a);
-//   char c[100];
-    IRReceiver a = IRReceiver(0, true);
-
-  while(1){
-    // b.sendData(data,2);
-    // _delay_ms(500);
-    a.Receive();
-    // Serial.write(c);
+    while(length==0);
+    Serial.write("Sending...\n\r");
+    transmitter.sendData(data,length);
+    Serial.write("Data send!\n\r");
+    #elif RECIEVER
+    reciever.Receive();
+    #endif
   }
   
 }
