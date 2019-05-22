@@ -5,7 +5,7 @@
 #include "myDelay.hpp"
 #include "ManchesterDecoder.hpp"
 #include "IRReceiver.hpp"
-#define SENDER
+#define RECEIVER
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -19,7 +19,8 @@ void loop() {
     IRTransmitter transmitter = IRTransmitter(new ManchesterEncoder(),a);
     uint8_t data[1024];
     uint32_t length=0;
-    #elif RECIEVER
+    #endif
+    #ifdef RECEIVER
     IRReceiver reciever = IRReceiver(0, true);
     #endif
   while(1){
@@ -32,7 +33,8 @@ void loop() {
     Serial.write("Sending...\n\r");
     transmitter.sendData(data,length);
     Serial.write("Data send!\n\r");
-    #elif RECIEVER
+    #endif
+    #ifdef RECEIVER
     reciever.Receive();
     #endif
   }
