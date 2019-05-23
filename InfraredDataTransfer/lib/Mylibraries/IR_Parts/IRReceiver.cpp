@@ -2,16 +2,17 @@
 #include "avr/interrupt.h"
 
 volatile bool trig = false;
-unsigned long timestamp[3];
+volatile unsigned long timestamp[3];
 volatile uint8_t buffcnt = 0; 
-uint8_t counter = 0;
-unsigned long T = 0;
-unsigned long current;
-unsigned long previous;
+volatile uint8_t counter = 0;
+volatile unsigned long T = 0;
+volatile unsigned long current;
+volatile unsigned long previous;
 volatile uint8_t buff = 0;
 
 ISR(INT0_vect)
 {
+    TCNT3=0;
     if(!trig)
     {
         timestamp[counter++] = micros(); 
@@ -29,10 +30,11 @@ ISR(INT0_vect)
             T = (T+treT)>>1;
             previous = timestamp[2];
             counter = 0;
+            TIMSK3 = 0;
         }
         else{
             counter = 0;
-            Serial.write('G');
+            Serial.write("Timing failed \n\r");
         }
     }
 
@@ -50,50 +52,63 @@ ISR(INT0_vect)
         else if((double)current-(double)previous > 2.0f*(double)T)
         {
             trig = false;
-            Serial.write('f');
+            Serial.write("Data reading Failed \n\r");
         }
     }
 }
 
+ISR(TIMER3_COMPA_vect)
+{
+    counter = 0;
+}
+
 ISR(INT1_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT2_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT3_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT4_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT5_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT6_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 ISR(INT7_vect)
 {
-    Serial.write('A');
+    Serial.write("Not configured to receive data \n\r");
 }
 
 IRReceiver::IRReceiver(int inter, bool setup){
     if(setup){
-    setupInterrupt(inter);
-    sei();
+        cli();
+        setupInterrupt(inter);
+        TCCR3A = 0;
+        TCCR3B = 0;
+        TCNT3 = 3;
+        OCR3A = 1561;
+        TCCR3B |= (1<< WGM32);
+        TCCR3B |= (1<<CS32) | (1<<CS30);
+        TIMSK3 |= (1<<OCIE3A);
+        sei();
     }
 }
 
@@ -148,21 +163,36 @@ void IRReceiver::Receive(){
         }
         if(index == arrayLen){
             trig = false;
+            counter=0;
         }
     }
+    TIMSK3 |= (1<<OCIE3A);
 
     uint32_t arrayChecksum=0;
     arrayChecksum=checksum[0]+((uint32_t)checksum[1]<<8)+((uint32_t)checksum[2]<<16)+((uint32_t)checksum[3]<<24);
 
-    char d[100];
-    snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
-    Serial.write(d);
-    snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
-    Serial.write(d);
-    snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
-    Serial.write(d);
-    snprintf(d, 100, "Array[0] =  %u \n\r" ,array[0]);
-    Serial.write(d);
+    if(arrayChecksum != Cmpchecksum)
+    {
+        Serial.write("Data corrupted");
+    }
+
+    else{
+        char d[100];
+        snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
+        Serial.write(d);
+        snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
+        Serial.write(d);
+        snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
+        Serial.write(d);
+        cli();
+        for (size_t i = 0; i < arrayLen; i++)
+        {
+            snprintf(d, 100, "%c" ,array[i]);
+            Serial.write(d);
+        }
+        Serial.write("\n\r");
+        sei();
+    }
 }
 
 void IRReceiver::setFrequence(int val){
