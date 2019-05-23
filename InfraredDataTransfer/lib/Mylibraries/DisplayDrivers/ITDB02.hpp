@@ -7,22 +7,20 @@ private:
     void WriteData(unsigned int data);
     void WriteCommand(unsigned int command);
     void SleepOut();
-    uint8_t CurrentRow;
-    uint8_t CurrentCol;
+    uint16_t CurrentRow;
+    uint16_t CurrentCol;
 public:
     ITDB02();
     ~ITDB02();
     void DisplayOff();
     void DisplayOn();
-    void MemoryAccessControl(unsigned char parameter);
-    void InterfacePixelFormat(unsigned char parameter);
-    void WritePixel(unsigned char Red, unsigned char Blue, unsigned char Green);
-    void SetColumnAddress(unsigned int Start, unsigned int End);
-    void SetPageAddress(unsigned int Start, unsigned int End);
+    void MemoryAccessControl(uint8_t parameter);
+    void InterfacePixelFormat(uint8_t parameter);
+    void WritePixel(uint8_t Red, uint8_t Blue, uint8_t Green);
+    void SetColumnAddress(uint16_t Start, uint16_t End);
+    void SetPageAddress(uint16_t Start, uint16_t End);
     void MemoryWrite();
-    void FillRectangle(unsigned int StartX, unsigned int StartY, unsigned int Width, 
-                    unsigned int Height, unsigned char Red, unsigned char Green, unsigned char Blue);
-    void drawBMP(uint8_t* BMP);
-    void drawASCII(ASCII* character,unsigned int StartX, unsigned int StartY);
-    void drawString(char* string, uint8_t length);
+    void FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, uint8_t Red, uint8_t Green, uint8_t Blue);
+    void drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY);
+    void drawString(char* string, uint16_t length);
 };

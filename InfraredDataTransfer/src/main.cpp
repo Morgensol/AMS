@@ -31,36 +31,29 @@ void loop() {
   ITDB02 display =ITDB02();
   //initFont();
 	// All pixels white (background)
-	display.FillRectangle(0,0,320,240,31,63,31);
 	// // Draw red parts of danish flag
 	// display.FillRectangle(0,140,100,100,31,0,0);
 	// display.FillRectangle(0,0,100,100,31,0,0);
 	// display.FillRectangle(140,0,320-140,100,31,0,0);
 	// display.FillRectangle(140,140,320-140,100,31,0,0);
-  display.DisplayOn();
-  uint32_t fwidth=0;
-  char c[100];
-  c[0]='H';
-  c[1]='E';
-  c[2]='S';
-  c[3]='J';
-  c[4]='M';
-  c[5]='E';
-  c[6]='D';
-  c[7]='A';
-  c[8]='\n';
-  c[9]='E';
+  // uint32_t fwidth=0;
+  char c[]={"Okay her er en histore om en dreng der hedder quang, han er 7 aar bor i tailand han staar tidligt op om morgenen og gaar meget sent i seng, for quang har nok at se til skoent han bare er en dreng, hver morgen kl kvart i 5 gaar quang alene ned\n"};
   // for (size_t i = 0; i < 26; i++)
   // {
-  //   display.drawASCII(TimesNewRomanFont['A'+i],fwidth,0);
-  //   fwidth+=TimesNewRomanFont['A'+i]->width;
-  //   snprintf(c,100,"%c width = %u\n\r",'A'+i,TimesNewRomanFont['A'+i]->width);
+  //   display.drawASCII(TimesNewRomanFont['a'+i],fwidth,0);
+  //   fwidth+=TimesNewRomanFont['a'+i]->width;
+  //   snprintf(c,100,"%c width = %u\n\r",'a'+i,TimesNewRomanFont['a'+i]->width);
   //   Serial.write(c);
     
   //   usleep(100);
   // }
-  display.drawString(c,10);
-  
+  // display.drawASCII(TimesNewRomanFont['a'],0,0);
+  // display.drawASCII(TimesNewRomanFont['b'],0,311);
+  // display.drawASCII(TimesNewRomanFont['c'],220,0);
+  // display.drawASCII(TimesNewRomanFont['d'],220,311);
+  display.drawString(c,sizeof(c));
+   display.drawString(c,sizeof(c));
+   display.drawString(c,sizeof(c));
     #endif
   while(1){
     #ifdef SENDER
