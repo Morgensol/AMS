@@ -62,11 +62,6 @@ ISR(TIMER3_COMPA_vect)
     counter = 0;
 }
 
-ISR(INT1_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
 ISR(INT2_vect)
 {
     Serial.write("Not configured to receive data \n\r");
@@ -207,10 +202,6 @@ void IRReceiver::setupInterrupt(int inter){
     if(inter == 0){
         EICRA = 0b00000001;
         EIMSK |= 0b00000001;
-    }
-    else if(inter == 1){
-        EICRA = 0b00000100;
-        EIMSK |= 0b00000010;
     }
     else if(inter == 2){
         EICRA = 0b00010000;
