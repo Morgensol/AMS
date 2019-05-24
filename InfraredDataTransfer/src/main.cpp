@@ -70,17 +70,21 @@ void loop() {
     {
       Serial.write("TEMP");
       snprintf(data,20,"%s",temp.getTemp());
+      transmitter.sendData((uint8_t*)data,20);
     }
     else if(data[0]=='H' && data[1]=='U' && data[2]=='M')
     {
       Serial.write("HUM");
       snprintf(data,20,"%s",temp.getHum());
+      transmitter.sendData((uint8_t*)data,20);
     }
-    Serial.write(data);
-    Serial.write("Sending...\n\r");
-    transmitter.sendData((uint8_t*)data,length);
-    Serial.write("Data send!\n\r");
-    msleep(150+length);
+    else{
+      Serial.write(data);
+      Serial.write("Sending...\n\r");
+      transmitter.sendData((uint8_t*)data,length);
+      Serial.write("Data send!\n\r");
+      msleep(150+length);
+    }
     #endif
 
     #ifdef RECIEVER

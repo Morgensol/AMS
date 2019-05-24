@@ -1588,6 +1588,27 @@ ASCII_Char SPACE ={
     0b0000,
     0b0000
 };
+ASCII_Char PERCENT ={
+    0b0000000000000,
+    0b0000000000000,
+    0b0000000000000,
+    0b0000000000000,
+    0b0110000001000,
+    0b1001000010000,
+    0b1001000010000,
+    0b1001000100000,
+    0b1001001000000,
+    0b0110010001100,
+    0b0000010010010,
+    0b0000100010010,
+    0b0001000010010,
+    0b0010000010010,
+    0b0010000001100,
+    0b0000000000000,
+    0b0000000000000,
+    0b0000000000000,
+    0b0000000000000
+};
 
 
 
@@ -1666,6 +1687,7 @@ struct ASCII _QUESTION_MARK = {.map=QUESTION_MARK,.width=8,.height=19};
 struct ASCII _DASH = {.map=DASH,.width=5,.height=19};
 struct ASCII _UNDERSCORE = {.map=UNDERSCORE,.width=8,.height=19};
 struct ASCII _SPACE = {.map=SPACE,.width=4,.height=19};
+struct ASCII _PERCENT = {.map=PERCENT,.width=13,.height=19};
 
 struct ASCII* TimesNewRomanFont[255]{
     TimesNewRomanFont['A']=&_A,
@@ -1741,5 +1763,6 @@ struct ASCII* TimesNewRomanFont[255]{
     TimesNewRomanFont['?']=&_QUESTION_MARK,
     TimesNewRomanFont['-']=&_DASH,
     TimesNewRomanFont['_']=&_UNDERSCORE,
-    TimesNewRomanFont[' ']=&_SPACE
+    TimesNewRomanFont[' ']=&_SPACE,
+    TimesNewRomanFont[' ']=&_PERCENT
 };
