@@ -6,7 +6,7 @@
 #include "ManchesterDecoder.hpp"
 #include "IRReceiver.hpp"
 #include "ITDB02.hpp"
-#define TEST
+#define SENDER
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);

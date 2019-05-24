@@ -173,12 +173,12 @@ void IRReceiver::Receive(){
 
     else{
         char d[100];
-        snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
-        Serial.write(d);
-        snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
-        Serial.write(d);
-        snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
-        Serial.write(d);
+        // snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
+        // Serial.write(d);
+        // snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
+        // Serial.write(d);
+        // snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
+        // Serial.write(d);
         cli();
         for (size_t i = 0; i < arrayLen; i++)
         {
