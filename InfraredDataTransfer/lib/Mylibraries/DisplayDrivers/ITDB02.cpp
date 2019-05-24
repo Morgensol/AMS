@@ -57,9 +57,12 @@ ITDB02::ITDB02()
 	DDRA = 0xFF,
 	DDRC = 0xFF;
 	RST_PORT &= ~(1<<RST_BIT);
+    _delay_ms(500);
 	RST_PORT |= (1<<RST_BIT);
 	_delay_ms(130); //Give it time to think before sending new commands
     //Specifies the interface for pixels and data
+
+    SleepOut();
 	MemoryAccessControl(0b00001000);
 	InterfacePixelFormat(0b00000101);
     CurrentCol=0;
@@ -150,6 +153,7 @@ void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
     SetColumnAddress(StartX, StartX+character->height-1);
 	SetPageAddress(StartY, StartY+character->width-1);
 	MemoryWrite();
+    //Drawing the first bit of each array, then the second and so forth
     for (size_t column = 0; column < character->width; column++)
     {  
         for (size_t pixel = 0; pixel < character->height; pixel++)
@@ -168,47 +172,103 @@ void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
     
     
 }
+
 void ITDB02::drawString(char* string, uint16_t length)
 {
-    if(length==0)
-        return;
-    for (size_t i = 0; i < length-1; i++)
+    for (size_t i = 0; i < length-1; i++)   //Why -1?
     {
+        
         if(string[i]=='\n')
+            handleEndLine();
+
+        else if(tooManyCharacters(string[i]))
         {
-            if((CurrentRow+19)>VERTICAL_MAX-19)
-            {
-                CurrentRow=0;
-                CurrentCol=0;
-            }
+            if(tooManyLines(string[i]))
+                resetCurser();
             else
-            {
-                CurrentRow+=19;
-                CurrentCol=0;
-            }
-        }
-        else if(((CurrentCol+TimesNewRomanFont[(uint8_t)string[i]]->width) > HORIZONTAL_MAX-1))
-        {
-            if((CurrentRow+TimesNewRomanFont[(uint8_t)string[i]]->height)>(VERTICAL_MAX-19))
-            {
-                CurrentRow=0;
-                CurrentCol=0;
-            }
-            else
-            {
-                CurrentRow+=TimesNewRomanFont[(uint8_t)string[i]]->height;
-                CurrentCol=0;
-            }
-            drawASCII(TimesNewRomanFont[(uint8_t)string[i]],CurrentRow,CurrentCol);
-            CurrentCol=TimesNewRomanFont[(uint8_t)string[i]]->width;
+                newLine(string[i]); //The way we calculate a new line, if a more complicated program is written, will need to be calculated from the largest character in that line
+            
+            addNewCharacter(string[i], i);
+            CurrentCol += characterWidth(string[i]);
         } 
         else
         {
-            drawASCII(TimesNewRomanFont[(uint8_t)string[i]],CurrentRow,CurrentCol);
-            CurrentCol+=TimesNewRomanFont[(uint8_t)string[i]]->width;
+            addNewCharacter(string[i], i);
+            CurrentCol += characterWidth(string[i]);
+        }
+    }
+}
+
+void ITDB02::handleEndLine()
+{
+    if(tooManyLines('A'))
+        resetCurser();
+    else
+        newLine('A');
+}
+
+int ITDB02::characterWidth(char character)
+{
+    return TimesNewRomanFont[(uint8_t)character]->width;
+}
+
+int ITDB02::characterHeigth(char character)
+{
+    return TimesNewRomanFont[(uint8_t)character]->height;
+}
+
+bool ITDB02::tooManyCharacters(char character)
+{
+    return CurrentCol+characterWidth(character) >= HORIZONTAL_MAX;
+}
+
+bool ITDB02::tooManyLines(char character)
+{
+    return CurrentRow+characterHeigth(character) > (VERTICAL_MAX-19);
+}
+
+void ITDB02::resetCurser()
+{
+    resetLines();
+    resetLine();
+}
+
+void ITDB02::newLine(char character)
+{
+    CurrentRow += characterHeigth(character);
+    resetLine();
+}
+
+void ITDB02::resetLines()
+{
+    CurrentRow=0;
+}
+
+void ITDB02::resetLine()
+{
+    CurrentCol=0;
+}
+
+void ITDB02::addNewCharacter(char character, int index)
+{
+    drawASCII(TimesNewRomanFont[(uint8_t)character],CurrentRow,CurrentCol);
+    DrawnLines[CurrentRow/19].string[index] = character;
+    DrawnLines[CurrentRow/19].current_length++;
+}
+
+void ITDB02::scrollText()
+{
+    FillRectangle(0,0,320,240,31,63,31);
+    CurrentCol=0;
+    CurrentRow=0;
+    for (size_t lines = 0; lines < 12; lines++)
+    {
+        for (size_t character = 0; character < DrawnLines[lines].current_length; character++)
+        {
+            drawASCII(TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]],CurrentRow,CurrentCol);
+            CurrentCol+=TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]]->width;
         }
         
-
     }
     
 }

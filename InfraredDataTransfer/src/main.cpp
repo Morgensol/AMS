@@ -54,6 +54,7 @@ void loop() {
   display.drawString(c,sizeof(c));
    display.drawString(c,sizeof(c));
    display.drawString(c,sizeof(c));
+  // display.scrollText();
     #endif
   while(1){
     #ifdef SENDER
