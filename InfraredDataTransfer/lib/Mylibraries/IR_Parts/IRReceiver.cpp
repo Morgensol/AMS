@@ -5,7 +5,7 @@ volatile bool trig = false;
 volatile unsigned long timestamp[3];
 volatile uint8_t buffcnt = 0; 
 volatile uint8_t counter = 0;
-volatile unsigned long T = 0;
+volatile unsigned long Time = 0;
 volatile unsigned long current;
 volatile unsigned long previous;
 volatile uint8_t buff = 0;
@@ -21,13 +21,13 @@ ISR(INT0_vect)
     if(counter ==3 and !trig)
     {
         unsigned long treT = timestamp[1]-timestamp[0];
-        T = timestamp[2]-timestamp[1];
+        Time = timestamp[2]-timestamp[1];
         // char c[100];
         // snprintf(c,100,"T: %lu treT: %lu timestamp1: %lu timestamp2: %lu timestamp3: %lu",T,treT, timestamp[0],timestamp[1], timestamp[2]);
         // Serial.write(c);
-        if((double)T*3>(double)treT*0.85 && (double)treT*1.15>(double)T*3){
+        if((double)Time*3>(double)treT*0.85 && (double)treT*1.15>(double)Time*3){
             trig = true; 
-            T = (T+treT)>>1;
+            Time = (Time+treT)>>1;
             previous = timestamp[2];
             counter = 0;
             TIMSK3 = 0;
@@ -40,7 +40,7 @@ ISR(INT0_vect)
 
     if(trig){
         current = micros();
-        if((double)current-(double)previous > 0.80f*(double)T && 1.20f*(double)T > (double)current-(double)previous)
+        if((double)current-(double)previous > 0.80f*(double)Time && 1.20f*(double)Time > (double)current-(double)previous)
         {
             if((PIND&(1<<PIND0)))
             {
@@ -49,7 +49,7 @@ ISR(INT0_vect)
             previous = current;
             buffcnt++;
         }
-        else if((double)current-(double)previous > 2.0f*(double)T)
+        else if((double)current-(double)previous > 2.0f*(double)Time)
         {
             trig = false;
             Serial.write("Data reading Failed \n\r");
@@ -111,7 +111,7 @@ IRReceiver::~IRReceiver(){
     
 }
 
-void IRReceiver::Receive(){
+IRReturnData IRReceiver::Receive(){
     while(!trig)
     { 
     }   
@@ -143,15 +143,18 @@ void IRReceiver::Receive(){
     arrayLen=length[0]+((uint32_t)length[1]<<8)+((uint32_t)length[2]<<16)+((uint32_t)length[3]<<24);
 
     
-
-    volatile uint8_t array[arrayLen];
+     IRReturnData ret={
+        .length=arrayLen,
+        .streng = new volatile uint8_t[arrayLen]
+    };
+    
     volatile uint32_t index = 0;
     uint32_t Cmpchecksum =0;
     while(trig){
         if(buffcnt == 8)
         {
-            array[index]=buff;
-            Cmpchecksum += array[index];
+            ret.streng[index]=buff;
+            Cmpchecksum += ret.streng[index];
             index++;
             buffcnt = 0;
             buff = 0;
@@ -182,12 +185,14 @@ void IRReceiver::Receive(){
         cli();
         for (size_t i = 0; i < arrayLen; i++)
         {
-            snprintf(d, 100, "%c" ,array[i]);
+            snprintf(d, 100, "%c" ,ret.streng[i]);
             Serial.write(d);
         }
         Serial.write("\n\r");
+
         sei();
     }
+    return ret;
 }
 
 void IRReceiver::setFrequence(int val){
