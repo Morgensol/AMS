@@ -252,8 +252,8 @@ void ITDB02::resetLine()
 void ITDB02::addNewCharacter(char character, int index)
 {
     drawASCII(TimesNewRomanFont[(uint8_t)character],CurrentRow,CurrentCol);
-    DrawnLines[CurrentRow/19].string[index] = character;
-    DrawnLines[CurrentRow/19].current_length++;
+    //DrawnLines[CurrentRow/19].string[index] = character;
+    //DrawnLines[CurrentRow/19].current_length++;
 }
 
 void ITDB02::scrollText()

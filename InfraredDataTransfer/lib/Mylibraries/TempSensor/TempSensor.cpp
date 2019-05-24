@@ -62,6 +62,7 @@ void TempSensor::setup(){
     cli();
     EICRA = 0b00000100;
     EIMSK |= 0b00000010;
+    sei();
 }
 
 char* TempSensor::getTemp(){

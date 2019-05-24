@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include "CTCTimer.hpp"
+
+struct IRReturnData{
+    uint32_t length;
+    uint8_t* streng;
+};
 class IRReceiver{
 private:
 int frequence = 0;
@@ -11,5 +16,5 @@ IRReceiver(int inter, bool setup);
 void setupInterrupt(int inter);
 int getFrequence();
 void setFrequence(int val);
-void Receive();
+IRReturnData Receive();
 };
