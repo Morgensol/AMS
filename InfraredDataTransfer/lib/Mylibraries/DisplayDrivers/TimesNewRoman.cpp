@@ -1764,5 +1764,5 @@ struct ASCII* TimesNewRomanFont[255]{
     TimesNewRomanFont['-']=&_DASH,
     TimesNewRomanFont['_']=&_UNDERSCORE,
     TimesNewRomanFont[' ']=&_SPACE,
-    TimesNewRomanFont[' ']=&_PERCENT
+    TimesNewRomanFont['%']=&_PERCENT
 };

@@ -154,7 +154,7 @@ char* TempSensor::getTemp(){
             signedTemp = (int16_t)Temp;
         }
         accurateTemp = signedTemp*0.1;
-        snprintf(message, 20, "Temperatur = %.1f C", accurateTemp);
+        snprintf(message, 20, "Temperatur = %.1f C  ", accurateTemp);
         Serial.write(message);
         return message;
     }
@@ -246,7 +246,7 @@ char* TempSensor::getHum(){
         uint16_t RH = ((RHi<<8)+RHd);
         signedRH = (int16_t)RH;
         accurateRH = signedRH*0.1;
-        snprintf(message, 20, "Humidity = %.1f %%", accurateRH);
+        snprintf(message, 20, "Humidity = %.1f %%  ", accurateRH);
         Serial.write(message);
         return message;
     }
