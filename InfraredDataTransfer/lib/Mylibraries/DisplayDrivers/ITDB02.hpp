@@ -1,6 +1,9 @@
-
+#ifndef ITDB02_H
+#define ITDB02_H
 #include "TimesNewRoman.hpp"
-
+#include "Arduino.h"
+#include <stdint.h>
+#include "Color.hpp"
 struct HLine{
     char string[21];
     uint8_t current_length=0;
@@ -11,8 +14,8 @@ private:
     void WriteData(unsigned int data);
     void WriteCommand(unsigned int command);
     void SleepOut();
-    uint16_t CurrentRow;
-    uint16_t CurrentCol;
+    uint16_t CurrentRow=0;
+    uint16_t CurrentCol=0;
     struct HLine DrawnLines[12];
 
     void handleEndLine();
@@ -38,8 +41,9 @@ public:
     void MemoryWrite();
     void VerticalScroll(uint16_t TFA, uint16_t VSA, uint16_t BFA);
     void VerticalScrollStartAdress(uint16_t VSP);
-    void FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, uint8_t Red, uint8_t Green, uint8_t Blue);
+    void FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, Color rgb);
     void drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY);
     void drawString(char* string, uint16_t length);
     void scrollText();
 };
+#endif

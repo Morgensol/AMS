@@ -1,7 +1,4 @@
-#include "Arduino.h"
 #include "ITDB02.hpp"
-#include <stdint.h>
-
 // Data port definitions:
 #define DATA_PORT_HIGH PORTA
 #define DATA_PORT_LOW  PORTC
@@ -29,10 +26,10 @@ void ITDB02::WriteCommand(uint16_t command)
 	DC_PORT &= ~(1<<DC_BIT);
 	CS_PORT &= ~(1<<CS_BIT);
 	WR_PORT &= ~(1<<WR_BIT);
-	_NOP(); //wait 60ns
+	_NOP();                     //wait 60ns
 	WR_PORT |= (1<<WR_BIT);
 	CS_PORT |= (1<<CS_BIT);
-	_NOP(); //Wait 60ns
+	_NOP();                     //Wait 60ns
 }
 
 // ILI 9341 data sheet, page 238
@@ -43,11 +40,12 @@ void ITDB02::WriteData(uint16_t data)
 	DC_PORT |= (1<<DC_BIT);
 	CS_PORT &= ~(1<<CS_BIT);
 	WR_PORT &= ~(1<<WR_BIT);
-	_NOP(); //Wait 60ns
+	_NOP();                     //Wait 60ns
 	WR_PORT |= (1<<WR_BIT);
 	CS_PORT |= (1<<CS_BIT);
-	_NOP(); // Wait 60ns
+	_NOP();                     //Wait 60ns
 }
+
 ITDB02::ITDB02()
 {
     WR_DDR |= (1<<WR_BIT);
@@ -60,15 +58,13 @@ ITDB02::ITDB02()
     _delay_ms(500);
 	RST_PORT |= (1<<RST_BIT);
 	_delay_ms(130); //Give it time to think before sending new commands
+    
     //Specifies the interface for pixels and data
-
     SleepOut();
 	MemoryAccessControl(0b00001000);
 	InterfacePixelFormat(0b00000101);
-    CurrentCol=0;
-    CurrentRow=0;
-    FillRectangle(0,0,320,240,31,63,31); //Make a white background
-    DisplayOn(); //Turn On display
+    FillRectangle(0,0,320,240,Color(WHITE)); //Make a white background
+    DisplayOn();
 }
 
 void ITDB02::DisplayOff()
@@ -137,7 +133,7 @@ void ITDB02::SetPageAddress(uint16_t Start, uint16_t End)
 // (StartX,StartY) = Upper left corner. X horizontal (0-319) , Y vertical (0-239).
 // Height (1-240) is vertical. Width (1-320) is horizontal.
 // R-G-B = 5-6-5 bits.
-void ITDB02::FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, uint8_t Red, uint8_t Green, uint8_t Blue)
+void ITDB02::FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, Color rgb)
 {
 	SetColumnAddress(StartY, StartY+Height-1);
 	SetPageAddress(StartX, StartX+Width-1);
@@ -145,7 +141,7 @@ void ITDB02::FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uin
 		
 	for(uint32_t t = 0; t < (uint32_t)Width * (uint32_t)Height; t++)
 	{
-		WritePixel(Red, Green, Blue);
+		WritePixel(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
 	}
 }
 void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
@@ -258,7 +254,8 @@ void ITDB02::addNewCharacter(char character, int index)
 
 void ITDB02::scrollText()
 {
-    FillRectangle(0,0,320,240,31,63,31);
+    Color rgb(WHITE);
+    FillRectangle(0,0,320,240,rgb);
     CurrentCol=0;
     CurrentRow=0;
     for (size_t lines = 0; lines < 12; lines++)

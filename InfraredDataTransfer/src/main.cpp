@@ -12,6 +12,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   // Serial.setTimeout(10000);
+  setupTimesNewRoman();
 }
 
 void loop() {
@@ -40,6 +41,7 @@ void loop() {
 	// display.FillRectangle(140,0,320-140,100,31,0,0);
 	// display.FillRectangle(140,140,320-140,100,31,0,0);
   // uint32_t fwidth=0;
+  char d[]={"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/.,-?!:;-_"};
   char c[]={"Okay her er en histore om en dreng der hedder quang, han er 7 aar bor i tailand han staar tidligt op om morgenen og gaar meget sent i seng, for quang har nok at se til skoent han bare er en dreng, hver morgen kl kvart i 5 gaar quang alene ned\n"};
   // for (size_t i = 0; i < 26; i++)
   // {
@@ -54,9 +56,9 @@ void loop() {
   // display.drawASCII(TimesNewRomanFont['b'],0,311);
   // display.drawASCII(TimesNewRomanFont['c'],220,0);
   // display.drawASCII(TimesNewRomanFont['d'],220,311);
-  display.drawString(c,sizeof(c));
-   display.drawString(c,sizeof(c));
-   display.drawString(c,sizeof(c));
+  display.drawString(d,sizeof(d));
+  //  display.drawString(c,sizeof(c));
+  //  display.drawString(c,sizeof(d));
   // display.scrollText();
     #endif
   while(1){
@@ -79,7 +81,7 @@ void loop() {
       transmitter.sendData((uint8_t*)data,20);
     }
     else{
-      Serial.write(data);
+      Serial.write(data,length);
       Serial.write("Sending...\n\r");
       transmitter.sendData((uint8_t*)data,length);
       Serial.write("Data send!\n\r");

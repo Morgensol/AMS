@@ -8,6 +8,7 @@ struct ASCII{
     uint8_t width;
     uint8_t height;
 };
-extern struct ASCII* TimesNewRomanFont[255];
+extern struct ASCII* TimesNewRomanFont[400];
+void setupTimesNewRoman();
 
 #endif
