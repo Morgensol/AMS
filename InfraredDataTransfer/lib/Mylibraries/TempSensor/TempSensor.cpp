@@ -24,7 +24,6 @@ ISR(INT1_vect)
         {
             start = false;
             dataCounter = 0;
-            Serial.write("data is ready");
         }
     }
 
@@ -66,81 +65,10 @@ void TempSensor::setup(){
 }
 
 char* TempSensor::getTemp(){
-    cli();
-    DDRD |= 1<<1;
-    PORTD &=~(1<<1);
-    _delay_us(1200);
-    PORTD |= 1<<1;
-    _delay_us(35);
-    DDRD &=~(1<<1);
-    sei();
-    _delay_ms(10);
-    uint8_t inserter = 0; 
-    for (size_t i = 8; i > 0; i--)
+    sendStartSequence();
+    getData();
+    if(checkParity())
     {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            RHi &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            RHi |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            RHd &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            RHd |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Tempi &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            Tempi |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Tempd &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            Tempd |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Parity &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 100 && 145 > data[inserter]+data[inserter+1]){
-            Parity |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    uint16_t paritycheck = RHi+RHd+Tempi+Tempd;
-
-    if(paritycheck > 255)
-    {
-        for (size_t i = 15; i > 7; i--)
-        {
-            paritycheck &=~(1<<(i));
-        }
-    }
-
-    counter = 0;
-
-    if(paritycheck == Parity)
-    {
-        Serial.write("Success\n\r");
         double accurateTemp;
         int16_t signedTemp;
         uint16_t Temp = ((Tempi<<8)+Tempd);
@@ -154,7 +82,7 @@ char* TempSensor::getTemp(){
             signedTemp = (int16_t)Temp;
         }
         accurateTemp = signedTemp*0.1;
-        snprintf(message, 20, "Temperatur = %.1f C  ", accurateTemp);
+        snprintf(message, 20, "Temperatur = %.1f C ", accurateTemp);
         Serial.write(message);
         return message;
     }
@@ -166,81 +94,10 @@ char* TempSensor::getTemp(){
 }
 
 char* TempSensor::getHum(){
-    cli();
-    DDRD |= 1<<1;
-    PORTD &=~(1<<1);
-    _delay_us(1200);
-    PORTD |= 1<<1;
-    _delay_us(35);
-    DDRD &=~(1<<1);
-    sei();
-    _delay_ms(10);
-    uint8_t inserter = 0; 
-    for (size_t i = 8; i > 0; i--)
+    sendStartSequence();
+    getData();
+    if(checkParity())
     {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            RHi &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            RHi |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            RHd &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            RHd |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Tempi &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            Tempi |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Tempd &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
-            Tempd |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    for (size_t i = 8; i > 0; i--)
-    {
-        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
-            Parity &=~(1<<(i-1));
-        }
-        if(data[inserter]+data[inserter+1] > 100 && 145 > data[inserter]+data[inserter+1]){
-            Parity |= (1<<(i-1));
-        }
-        inserter = inserter+2;
-    }
-    uint16_t paritycheck = RHi+RHd+Tempi+Tempd;
-
-    if(paritycheck > 255)
-    {
-        for (size_t i = 15; i > 7; i--)
-        {
-            paritycheck &=~(1<<(i));
-        }
-    }
-
-    counter = 0;
-
-    if(paritycheck == Parity)
-    {
-        Serial.write("Success\n\r");
         double accurateRH;
         int16_t signedRH;
         uint16_t RH = ((RHi<<8)+RHd);
@@ -256,4 +113,98 @@ char* TempSensor::getHum(){
         return message;
     }
 }
+
+void TempSensor::sendStartSequence()
+{
+    cli();
+    DDRD |= 1<<1;
+    PORTD &=~(1<<1);
+    _delay_us(1200);
+    PORTD |= 1<<1;
+    _delay_us(35);
+    DDRD &=~(1<<1);
+    sei();
+}
+
+void TempSensor::getData()
+{
+    _delay_ms(10);
+    uint8_t inserter = 0; 
+    for (size_t i = 8; i > 0; i--)
+    {
+        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
+            RHi &=~(1<<(i-1));
+        }
+        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
+            RHi |= (1<<(i-1));
+        }
+        inserter = inserter+2;
+    }
+    for (size_t i = 8; i > 0; i--)
+    {
+        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
+            RHd &=~(1<<(i-1));
+        }
+        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
+            RHd |= (1<<(i-1));
+        }
+        inserter = inserter+2;
+    }
+    for (size_t i = 8; i > 0; i--)
+    {
+        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
+            Tempi &=~(1<<(i-1));
+        }
+        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
+            Tempi |= (1<<(i-1));
+        }
+        inserter = inserter+2;
+    }
+    for (size_t i = 8; i > 0; i--)
+    {
+        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
+            Tempd &=~(1<<(i-1));
+        }
+        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
+            Tempd |= (1<<(i-1));
+        }
+        inserter = inserter+2;
+    }
+    for (size_t i = 8; i > 0; i--)
+    {
+        if(data[inserter]+data[inserter+1] > 70 && 90 > data[inserter]+data[inserter+1]){
+            Parity &=~(1<<(i-1));
+        }
+        if(data[inserter]+data[inserter+1] > 110 && 145 > data[inserter]+data[inserter+1]){
+            Parity |= (1<<(i-1));
+        }
+        inserter = inserter+2;
+    }   
+}
+
+bool TempSensor::checkParity()
+{
+    uint16_t paritycheck = RHi+RHd+Tempi+Tempd;
+
+    if(paritycheck > 255)
+    {
+        for (size_t i = 15; i > 7; i--)
+        {
+            paritycheck &=~(1<<(i));
+        }
+    }
+
+    counter = 0;
+
+    if(paritycheck == Parity)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
 
