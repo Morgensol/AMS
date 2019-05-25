@@ -65,6 +65,7 @@ ITDB02::ITDB02()
 	InterfacePixelFormat(0b00000101);
     FillRectangle(0,0,320,240,Color(WHITE)); //Make a white background
     DisplayOn();
+    Screen = new Lines(20,maxLines);
 }
 
 void ITDB02::DisplayOff()
@@ -169,7 +170,72 @@ void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
     
 }
 
+
 void ITDB02::drawString(char* string, uint16_t length)
+{
+    Lines* newLines = splitString(string,length);
+    for (uint8_t lineNmbr = 0; lineNmbr < newLines->getMaxLines(); lineNmbr++)      
+        addLineToScreen(newLines->getLine(lineNmbr));
+    drawScreen();
+}
+
+Lines* ITDB02::splitString(char* string, uint16_t length)
+{
+    uint8_t numberOfLines = (uint8_t)(length/20) + 1; // vurder om ekstra linje ved præcis skal fixes
+    Lines* returnObj= new Lines(20, numberOfLines);
+    
+    for ( uint16_t i=0, startPos = 0; i < numberOfLines; i++, startPos += 20)
+        returnObj->addLine(i, getNextString(string, 20, startPos));
+    
+    return returnObj;
+}
+
+void ITDB02::addLineToScreen(Line* lineToAdd)
+{
+    if (activeLines+1 == Screen->getMaxLines())
+        moveScreenLinesUp();
+    Screen->addLine(activeLines,lineToAdd);
+    activeLines += activeLines+1 >= Screen->getMaxLines() ? 0 : 1;
+}
+
+Line* ITDB02::getNextString(char* string, uint16_t maxLineLength, uint16_t startPos)
+{
+    Line* bufferLine = new Line(maxLineLength);
+    for (uint16_t i = 0; i < maxLineLength; i++)
+        bufferLine->addChar(string[i + startPos],i);
+    return bufferLine;
+}
+
+void ITDB02::drawScreen()
+{
+    CurrentRow=0;
+    for (uint16_t i = 0; i < Screen->getMaxLines(); i++)
+    {
+        CurrentCol = 0;
+        drawLine(i);
+        CurrentRow+=characterHeigth('A');  
+    }
+}
+
+void ITDB02::drawLine(uint16_t lineNmbr)
+{
+    Line* tempLine = Screen->getLine(lineNmbr);
+
+    for (uint8_t i = 0; i < tempLine->getLength(); i++)
+    {
+        drawASCII(TimesNewRomanFont[(uint8_t)tempLine->getChar(i)],CurrentRow,CurrentCol);
+        CurrentCol+=characterWidth(tempLine->getChar(i));
+    }
+    delete tempLine;
+}
+
+void ITDB02::moveScreenLinesUp()
+{
+    for (uint8_t i = 0; i < Screen->getMaxLines()-1; i++)
+        Screen->addLine(i,Screen->getLine(i+1));
+    
+}
+void ITDB02::legacyWriteString(char* string, uint16_t length)
 {
     for (size_t i = 0; i < length-1; i++)   //Why -1?
     {
