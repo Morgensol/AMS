@@ -5,32 +5,20 @@
 #include <stdint.h>
 #include "Color.hpp"
 #include "Lines.hpp"
-struct HLine{
-    char string[21];
-    uint8_t current_length=0;
-};
+
 class ITDB02
 {
 private:
     void WriteData(unsigned int data);
     void WriteCommand(unsigned int command);
     void SleepOut();
-    uint16_t CurrentRow=0;
-    uint16_t CurrentCol=0;
-    struct HLine DrawnLines[12];
+    uint16_t Y_pos=0;
+    uint16_t X_pos=0; //X_Pos
     Lines* Screen;
     uint8_t maxLines=12;
     uint8_t activeLines=0;
-    void handleEndLine();
-    int characterWidth(char);
-    int characterHeigth(char);
-    bool tooManyCharacters(char);
-    bool tooManyLines(char);
-    void resetCurser(void);
-    void newLine(char);
-    void resetLine(void);
-    void resetLines(void);
-    void addNewCharacter(char, int);
+    uint16_t getCharWidth(char);
+    uint16_t getCharHeight(char);
     Line* getNextString(char* string, uint16_t maxLineLength, uint16_t startPos);
     void addLineToScreen(Line* lineToAdd);
     void drawScreen();
@@ -44,7 +32,7 @@ public:
     void DisplayOn();
     void MemoryAccessControl(uint8_t parameter);
     void InterfacePixelFormat(uint8_t parameter);
-    void WritePixel(uint8_t Red, uint8_t Blue, uint8_t Green);
+    void WritePixel(Color rgb);
     void SetColumnAddress(uint16_t Start, uint16_t End);
     void SetPageAddress(uint16_t Start, uint16_t End);
     void MemoryWrite();
@@ -53,7 +41,6 @@ public:
     void FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, Color rgb);
     void drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY);
     void drawString(char* string, uint16_t length);
-    void scrollText();
     Lines* splitString(char* string, uint16_t length);
 };
 #endif
