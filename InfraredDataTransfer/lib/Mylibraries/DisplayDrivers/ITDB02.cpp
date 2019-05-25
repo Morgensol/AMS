@@ -65,7 +65,7 @@ ITDB02::ITDB02()
 	InterfacePixelFormat(0b00000101);
     FillRectangle(0,0,320,240,Color(WHITE)); //Make a white background
     DisplayOn();
-    Screen = new Lines(20,maxLines);
+    Screen = new Lines(80,maxLines);
 }
 
 void ITDB02::DisplayOff()
@@ -177,15 +177,42 @@ void ITDB02::drawString(char* string, uint16_t length)
     for (uint8_t lineNmbr = 0; lineNmbr < newLines->getMaxLines(); lineNmbr++)      
         addLineToScreen(newLines->getLine(lineNmbr));
     drawScreen();
+    delete newLines;
 }
 
 Lines* ITDB02::splitString(char* string, uint16_t length)
 {
-    uint8_t numberOfLines = (uint8_t)(length/20) + 1; // vurder om ekstra linje ved præcis skal fixes
-    Lines* returnObj= new Lines(20, numberOfLines);
-    
-    for ( uint16_t i=0, startPos = 0; i < numberOfLines; i++, startPos += 20)
-        returnObj->addLine(i, getNextString(string, 20, startPos));
+    char c[50];
+    uint8_t numberOfLines = 0; // vurder om ekstra linje ved præcis skal fixes
+    uint16_t pixelsToDraw=0;
+    uint16_t pixelsToDrawCheck=0;
+    uint16_t charsToDraw[12]={0};
+    uint8_t charsCounter=0;
+    for (uint16_t i = 0; i < length; i++)
+    {
+        pixelsToDraw+=TimesNewRomanFont[(uint8_t)string[i]]->width;
+        pixelsToDrawCheck+=TimesNewRomanFont[(uint8_t)string[i]]->width;
+        charsToDraw[charsCounter]++;
+        if ((pixelsToDrawCheck+TimesNewRomanFont[(uint8_t)string[i+1]]->width) > HORIZONTAL_MAX)
+        {
+            charsCounter++;
+            pixelsToDrawCheck=0;
+        }
+        
+    }
+    Serial.write("W");
+    numberOfLines = (pixelsToDraw%HORIZONTAL_MAX)==0?pixelsToDraw/HORIZONTAL_MAX:(pixelsToDraw/HORIZONTAL_MAX)+1;
+    snprintf(c,50,"lines: %u, pixels: %u ",numberOfLines, pixelsToDraw);
+    Serial.write(c);
+    Lines* returnObj= new Lines(80, numberOfLines);
+    uint16_t startPos = 0;
+    for ( uint16_t i=0; i < numberOfLines; i++)
+    {
+        snprintf(c,50,"charsToDraw[%u] = %u ",i,charsToDraw[i]);
+        Serial.write(c);
+        returnObj->addLine(i, getNextString(string, charsToDraw[i], startPos));
+         startPos +=charsToDraw[i];
+    }
     
     return returnObj;
 }
