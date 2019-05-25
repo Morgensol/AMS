@@ -7,11 +7,11 @@
 #include "IRReceiver.hpp"
 #include "ITDB02.hpp"
 #include "TempSensor.hpp"
-#define RECIEVER
+#define SENDER
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  // Serial.setTimeout(10000);
+  Serial.setTimeout(10000);
   setupTimesNewRoman();
 }
 
