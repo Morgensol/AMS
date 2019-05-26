@@ -10,6 +10,8 @@ public:
     void setup();
     void sendStartSequence();
     void getData();
+    void calculateHum();
+    void calculateTemp();
     char* getTemp();
     char* getHum();
     bool checkParity();
