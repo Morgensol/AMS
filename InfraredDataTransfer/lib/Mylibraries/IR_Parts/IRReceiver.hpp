@@ -4,14 +4,14 @@
 
 struct IRReturnData{
     uint32_t length;
-    char* streng;
+    uint8_t* streng;
 };
 class IRReceiver{
 private:
 int frequence = 0;
 CTCTimer* _timer =NULL;
 public:
-IRReceiver();
+IRReceiver(bool setup);
 ~IRReceiver();
 void setupInterrupt();
 IRReturnData Receive();

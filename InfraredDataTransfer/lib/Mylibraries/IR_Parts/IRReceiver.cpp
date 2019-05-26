@@ -55,10 +55,19 @@ ISR(INT0_vect)
 }
 
 
-IRReceiver::IRReceiver(){
+IRReceiver::IRReceiver(bool setup){
+    if(setup){
         cli();
         setupInterrupt();
+        TCCR3A = 0;
+        TCCR3B = 0;
+        TCNT3 = 3;
+        OCR3A = 1561;
+        TCCR3B |= (1<< WGM32);
+        TCCR3B |= (1<<CS32) | (1<<CS30);
+        TIMSK3 |= (1<<OCIE3A);
         sei();
+    }
 }
 
 IRReceiver::~IRReceiver(){
@@ -99,7 +108,7 @@ IRReturnData IRReceiver::Receive(){
     
      IRReturnData ret={
         .length=arrayLen,
-        .streng = new volatile char[arrayLen]
+        .streng = new volatile uint8_t[arrayLen]
     };
     
     volatile uint32_t index = 0;
@@ -146,11 +155,4 @@ IRReturnData IRReceiver::Receive(){
 void IRReceiver::setupInterrupt(){
         EICRA = 0b00000001;
         EIMSK |= 0b00000001;
-        TCCR3A = 0;
-        TCCR3B = 0;
-        TCNT3 = 3;
-        OCR3A = 1561;
-        TCCR3B |= (1<< WGM32);
-        TCCR3B |= (1<<CS32) | (1<<CS30);
-        TIMSK3 |= (1<<OCIE3A);
 }
