@@ -69,7 +69,21 @@ char* TempSensor::getTemp(){
     getData();
     if(checkParity())
     {
-        calculateTemp();
+        double accurateTemp;
+        int16_t signedTemp;
+        uint16_t Temp = ((Tempi<<8)+Tempd);
+        if(Tempi & (1<<15))
+        {
+            Tempi &=~(1<<(15));
+            signedTemp = (int16_t)Temp*(-1);
+        }
+        else
+        {
+            signedTemp = (int16_t)Temp;
+        }
+        accurateTemp = signedTemp*0.1;
+        snprintf(message, 20, "Temperatur = %.1f C ", accurateTemp);
+        Serial.write(message);
         return message;
     }
     else
@@ -84,7 +98,13 @@ char* TempSensor::getHum(){
     getData();
     if(checkParity())
     {
-        calculateHum();
+        double accurateRH;
+        int16_t signedRH;
+        uint16_t RH = ((RHi<<8)+RHd);
+        signedRH = (int16_t)RH;
+        accurateRH = signedRH*0.1;
+        snprintf(message, 20, "Humidity = %.1f %%  ", accurateRH);
+        Serial.write(message);
         return message;
     }
     else
@@ -184,36 +204,6 @@ bool TempSensor::checkParity()
     {
         return false;
     }
-}
-
-void TempSensor::calculateHum()
-{
-    double accurateRH;
-    int16_t signedRH;
-    uint16_t RH = ((RHi<<8)+RHd);
-    signedRH = (int16_t)RH;
-    accurateRH = signedRH*0.1;
-    snprintf(message, 20, "Humidity = %.1f %%  ", accurateRH);
-    Serial.write(message);   
-}
-
-void TempSensor::calculateTemp()
-{
-    double accurateTemp;
-    int16_t signedTemp;
-    uint16_t Temp = ((Tempi<<8)+Tempd);
-    if(Tempi & (1<<15))
-    {
-        Tempi &=~(1<<(15));
-        signedTemp = (int16_t)Temp*(-1);
-    }
-    else
-    {
-        signedTemp = (int16_t)Temp;
-    }
-    accurateTemp = signedTemp*0.1;
-    snprintf(message, 20, "Temperatur = %.1f C ", accurateTemp);
-    Serial.write(message);
 }
 
 

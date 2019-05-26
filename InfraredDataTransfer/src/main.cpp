@@ -7,7 +7,7 @@
 #include "IRReceiver.hpp"
 #include "ITDB02.hpp"
 #include "TempSensor.hpp"
-#define RECIEVER
+#define TEST
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
