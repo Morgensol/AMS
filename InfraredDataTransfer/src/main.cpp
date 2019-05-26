@@ -59,8 +59,10 @@ void loop() {
 
     #ifdef RECIEVER
     IRReturnData ReadData= reciever.Receive();
+    cli();
     display.drawString((char*)"Recieved Message:\n",sizeof("Recieved Message:\n"));
-    display.drawString(ReadData.streng,ReadData.length);
+    display.drawString((char*)ReadData.streng,ReadData.length);
+    sei();
     delete[] ReadData.streng;
     #endif
   }  

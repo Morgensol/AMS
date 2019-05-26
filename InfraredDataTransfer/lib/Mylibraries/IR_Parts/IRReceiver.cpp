@@ -14,15 +14,13 @@ ISR(INT0_vect)
 {
     TCNT3=0;
     if(!trig)
-    {
         timestamp[counter++] = micros(); 
-    }
 
     if(counter ==3 and !trig)
     {
         unsigned long treT = timestamp[1]-timestamp[0];
         Time = timestamp[2]-timestamp[1];
-        if((double)Time*3>(double)treT*0.85 && (double)treT*1.15>(double)Time*3){
+        if((double)Time*3>(double)treT*0.80 && (double)treT*1.20>(double)Time*3){
             trig = true; 
             Time = (Time+treT)>>1;
             previous = timestamp[2];
@@ -40,9 +38,8 @@ ISR(INT0_vect)
         if((double)current-(double)previous > 0.80f*(double)Time && 1.20f*(double)Time > (double)current-(double)previous)
         {
             if((PIND&(1<<PIND0)))
-            {
                 buff+=1<<buffcnt;
-            }
+            
             previous = current;
             buffcnt++;
         }

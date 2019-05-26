@@ -8,13 +8,12 @@ struct IRReturnData{
 };
 class IRReceiver{
 private:
-int frequence = 0;
-CTCTimer* _timer =NULL;
-uint32_t readBuffer(uint8_t* output, uint32_t index);
-uint32_t calculateOriginal(uint8_t* array, uint32_t nmbrOfBytes);
+    CTCTimer* _timer =NULL;
+    uint32_t readBuffer(uint8_t* output, uint32_t index);
+    uint32_t calculateOriginal(uint8_t* array, uint32_t nmbrOfBytes);
 public:
-IRReceiver();
-~IRReceiver();
-void setupInterrupt();
-IRReturnData Receive();
+    IRReceiver();
+    ~IRReceiver();
+    void setupInterrupt();
+    IRReturnData Receive();
 };
