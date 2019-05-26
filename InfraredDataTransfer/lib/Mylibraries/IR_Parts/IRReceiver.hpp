@@ -11,8 +11,10 @@ private:
 int frequence = 0;
 CTCTimer* _timer =NULL;
 public:
-IRReceiver();
+IRReceiver(int inter, bool setup);
 ~IRReceiver();
-void setupInterrupt();
+void setupInterrupt(int inter);
+int getFrequence();
+void setFrequence(int val);
 IRReturnData Receive();
 };
