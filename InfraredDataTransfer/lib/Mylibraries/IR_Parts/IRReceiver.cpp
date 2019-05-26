@@ -145,7 +145,7 @@ IRReturnData IRReceiver::Receive(){
     
      IRReturnData ret={
         .length=arrayLen,
-        .streng = new volatile uint8_t[arrayLen]
+        .streng = new volatile char[arrayLen]
     };
     
     volatile uint32_t index = 0;

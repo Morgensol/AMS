@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include <stdint.h>
 #include "Color.hpp"
+#include "Lines.hpp"
 struct HLine{
     char string[21];
     uint8_t current_length=0;
@@ -17,7 +18,9 @@ private:
     uint16_t CurrentRow=0;
     uint16_t CurrentCol=0;
     struct HLine DrawnLines[12];
-
+    Lines* Screen;
+    uint8_t maxLines=12;
+    uint8_t activeLines=0;
     void handleEndLine();
     int characterWidth(char);
     int characterHeigth(char);
@@ -28,9 +31,15 @@ private:
     void resetLine(void);
     void resetLines(void);
     void addNewCharacter(char, int);
+    Line* getNextString(char* string, uint16_t maxLineLength, uint16_t startPos);
+    void addLineToScreen(Line* lineToAdd);
+    void drawScreen();
+    void moveScreenLinesUp();
+    void drawLine(uint16_t lineNmbr);
 public:
     ITDB02();
     ~ITDB02();
+    void legacyWriteString(char* string, uint16_t length);
     void DisplayOff();
     void DisplayOn();
     void MemoryAccessControl(uint8_t parameter);
@@ -45,5 +54,6 @@ public:
     void drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY);
     void drawString(char* string, uint16_t length);
     void scrollText();
+    Lines* splitString(char* string, uint16_t length);
 };
 #endif
