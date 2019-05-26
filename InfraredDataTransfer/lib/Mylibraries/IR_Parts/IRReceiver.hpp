@@ -4,7 +4,7 @@
 
 struct IRReturnData{
     uint32_t length;
-    uint8_t* streng;
+    char* streng;
 };
 class IRReceiver{
 private:
