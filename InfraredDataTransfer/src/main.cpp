@@ -7,7 +7,7 @@
 #include "IRReceiver.hpp"
 #include "ITDB02.hpp"
 #include "TempSensor.hpp"
-#define RECIEVER
+#define SENDER
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -26,7 +26,7 @@ void loop() {
     #endif
 
     #ifdef RECIEVER
-    IRReceiver reciever = IRReceiver(0, true);
+    IRReceiver reciever = IRReceiver(true);
     ITDB02 display= ITDB02();
     #endif
 
@@ -199,7 +199,6 @@ void loop() {
       transmitter.sendData((uint8_t*)data,20);
     }
     else{
-      Serial.write(data,length);
       Serial.write("Sending...\n\r");
       transmitter.sendData((uint8_t*)data,length);
       Serial.write("Data send!\n\r");
