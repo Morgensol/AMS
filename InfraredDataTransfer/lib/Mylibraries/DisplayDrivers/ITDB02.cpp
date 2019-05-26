@@ -262,39 +262,7 @@ void ITDB02::moveScreenLinesUp()
         Screen->addLine(i,Screen->getLine(i+1));
     
 }
-void ITDB02::legacyWriteString(char* string, uint16_t length)
-{
-    for (size_t i = 0; i < length-1; i++)   //Why -1?
-    {
-        
-        if(string[i]=='\n')
-            handleEndLine();
 
-        else if(tooManyCharacters(string[i]))
-        {
-            if(tooManyLines(string[i]))
-                resetCurser();
-            else
-                newLine(string[i]); //The way we calculate a new line, if a more complicated program is written, will need to be calculated from the largest character in that line
-            
-            addNewCharacter(string[i], i);
-            CurrentCol += characterWidth(string[i]);
-        } 
-        else
-        {
-            addNewCharacter(string[i], i);
-            CurrentCol += characterWidth(string[i]);
-        }
-    }
-}
-
-void ITDB02::handleEndLine()
-{
-    if(tooManyLines('A'))
-        resetCurser();
-    else
-        newLine('A');
-}
 
 int ITDB02::characterWidth(char character)
 {
@@ -304,61 +272,4 @@ int ITDB02::characterWidth(char character)
 int ITDB02::characterHeigth(char character)
 {
     return TimesNewRomanFont[(uint8_t)character]->height;
-}
-
-bool ITDB02::tooManyCharacters(char character)
-{
-    return CurrentCol+characterWidth(character) >= HORIZONTAL_MAX;
-}
-
-bool ITDB02::tooManyLines(char character)
-{
-    return CurrentRow+characterHeigth(character) > (VERTICAL_MAX-19);
-}
-
-void ITDB02::resetCurser()
-{
-    resetLines();
-    resetLine();
-}
-
-void ITDB02::newLine(char character)
-{
-    CurrentRow += characterHeigth(character);
-    resetLine();
-}
-
-void ITDB02::resetLines()
-{
-    CurrentRow=0;
-}
-
-void ITDB02::resetLine()
-{
-    CurrentCol=0;
-}
-
-void ITDB02::addNewCharacter(char character, int index)
-{
-    drawASCII(TimesNewRomanFont[(uint8_t)character],CurrentRow,CurrentCol);
-    //DrawnLines[CurrentRow/19].string[index] = character;
-    //DrawnLines[CurrentRow/19].current_length++;
-}
-
-void ITDB02::scrollText()
-{
-    Color rgb(WHITE);
-    FillRectangle(0,0,320,240,rgb);
-    CurrentCol=0;
-    CurrentRow=0;
-    for (size_t lines = 0; lines < 12; lines++)
-    {
-        for (size_t character = 0; character < DrawnLines[lines].current_length; character++)
-        {
-            drawASCII(TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]],CurrentRow,CurrentCol);
-            CurrentCol+=TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]]->width;
-        }
-        
-    }
-    
 }
