@@ -36,12 +36,10 @@ public:
     void DisplayOn();
     void MemoryAccessControl(uint8_t parameter);
     void InterfacePixelFormat(uint8_t parameter);
-    void WritePixel(uint8_t Red, uint8_t Blue, uint8_t Green);
+    void WritePixel(Color rgb);
     void SetColumnAddress(uint16_t Start, uint16_t End);
     void SetPageAddress(uint16_t Start, uint16_t End);
     void MemoryWrite();
-    void VerticalScroll(uint16_t TFA, uint16_t VSA, uint16_t BFA);
-    void VerticalScrollStartAdress(uint16_t VSP);
     void FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uint16_t Height, Color rgb);
     void drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY);
     void drawString(char* string, uint16_t length);

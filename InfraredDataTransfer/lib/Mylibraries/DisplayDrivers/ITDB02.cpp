@@ -102,12 +102,9 @@ void ITDB02::MemoryWrite()
 }
 
 // Red 0-31, Green 0-63, Blue 0-31
-void ITDB02::WritePixel(uint8_t Red, uint8_t Green, uint8_t Blue)
+void ITDB02::WritePixel(Color rgb)
 {
-	if((Red < 32) && (Green < 64) && (Blue <32))
-	{
-		WriteData((uint16_t)Red<<11 | (uint16_t)Green<<5 | (uint16_t)Blue);		
-	}
+	WriteData((uint16_t)rgb.getRed()<<11 | (uint16_t)rgb.getGreen()<<5 | (uint16_t)rgb.getBlue());		
 }
 
 // Set Column Address (0-239), Start > End
@@ -142,7 +139,7 @@ void ITDB02::FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uin
 		
 	for(uint32_t t = 0; t < (uint32_t)Width * (uint32_t)Height; t++)
 	{
-		WritePixel(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+		WritePixel(rgb);
 	}
 }
 void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
@@ -157,19 +154,15 @@ void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
         {
             if ((character->map[pixel]&(1<<((character->width-1)-column))))
             {
-                WritePixel(0,0,0); //black
+                WritePixel(Color(BLACK)); //black
             }
             else
             {
-                WritePixel(31,63,31); //white
+                WritePixel(Color(WHITE)); //white
             }     
         }
-        
-    }
-    
-    
+    } 
 }
-
 
 void ITDB02::drawString(char* string, uint16_t length)
 {
@@ -182,8 +175,7 @@ void ITDB02::drawString(char* string, uint16_t length)
 
 Lines* ITDB02::splitString(char* string, uint16_t length)
 {
-    char c[50];
-    uint8_t numberOfLines = 0; // vurder om ekstra linje ved præcis skal fixes
+    uint8_t numberOfLines = 0; 
     uint16_t pixelsToDraw=0;
     uint16_t pixelsToDrawCheck=0;
     uint16_t charsToDraw[12]={0};
@@ -200,16 +192,11 @@ Lines* ITDB02::splitString(char* string, uint16_t length)
         }
         
     }
-    Serial.write("W");
     numberOfLines = (pixelsToDraw%HORIZONTAL_MAX)==0?pixelsToDraw/HORIZONTAL_MAX:(pixelsToDraw/HORIZONTAL_MAX)+1;
-    snprintf(c,50,"lines: %u, pixels: %u ",numberOfLines, pixelsToDraw);
-    Serial.write(c);
     Lines* returnObj= new Lines(80, numberOfLines);
     uint16_t startPos = 0;
     for ( uint16_t i=0; i < numberOfLines; i++)
     {
-        snprintf(c,50,"charsToDraw[%u] = %u ",i,charsToDraw[i]);
-        Serial.write(c);
         returnObj->addLine(i, getNextString(string, charsToDraw[i], startPos));
          startPos +=charsToDraw[i];
     }
