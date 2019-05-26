@@ -22,9 +22,6 @@ ISR(INT0_vect)
     {
         unsigned long treT = timestamp[1]-timestamp[0];
         Time = timestamp[2]-timestamp[1];
-        // char c[100];
-        // snprintf(c,100,"T: %lu treT: %lu timestamp1: %lu timestamp2: %lu timestamp3: %lu",T,treT, timestamp[0],timestamp[1], timestamp[2]);
-        // Serial.write(c);
         if((double)Time*3>(double)treT*0.85 && (double)treT*1.15>(double)Time*3){
             trig = true; 
             Time = (Time+treT)>>1;
@@ -57,54 +54,11 @@ ISR(INT0_vect)
     }
 }
 
-ISR(TIMER3_COMPA_vect)
-{
-    counter = 0;
-}
 
-ISR(INT2_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-ISR(INT3_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-ISR(INT4_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-ISR(INT5_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-ISR(INT6_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-ISR(INT7_vect)
-{
-    Serial.write("Not configured to receive data \n\r");
-}
-
-IRReceiver::IRReceiver(int inter, bool setup){
-    if(setup){
+IRReceiver::IRReceiver(){
         cli();
-        setupInterrupt(inter);
-        TCCR3A = 0;
-        TCCR3B = 0;
-        TCNT3 = 3;
-        OCR3A = 1561;
-        TCCR3B |= (1<< WGM32);
-        TCCR3B |= (1<<CS32) | (1<<CS30);
-        TIMSK3 |= (1<<OCIE3A);
+        setupInterrupt();
         sei();
-    }
 }
 
 IRReceiver::~IRReceiver(){
@@ -176,12 +130,6 @@ IRReturnData IRReceiver::Receive(){
 
     else{
         char d[100];
-        // snprintf(d, 100, "Length = %lu \n\r" ,arrayLen);
-        // Serial.write(d);
-        // snprintf(d, 100, "Checksum = %lu \n\r" ,arrayChecksum);
-        // Serial.write(d);
-        // snprintf(d, 100, "CmpChecksum = %lu \n\r" ,Cmpchecksum);
-        // Serial.write(d);
         cli();
         for (size_t i = 0; i < arrayLen; i++)
         {
@@ -195,41 +143,14 @@ IRReturnData IRReceiver::Receive(){
     return ret;
 }
 
-void IRReceiver::setFrequence(int val){
-    frequence = val;
-}
-
-int IRReceiver::getFrequence(){
-    return frequence;
-}
-
-void IRReceiver::setupInterrupt(int inter){
-    if(inter == 0){
+void IRReceiver::setupInterrupt(){
         EICRA = 0b00000001;
         EIMSK |= 0b00000001;
-    }
-    else if(inter == 2){
-        EICRA = 0b00010000;
-        EIMSK |= 0b00000100;
-    }
-    else if(inter == 3){
-        EICRA = 0b01000000;
-        EIMSK |= 0b00001000;
-    }
-    else if(inter == 4){
-        EICRB = 0b00000001;
-        EIMSK |= 0b00010000;
-    }
-    else if(inter == 5){
-        EICRB = 0b00000100;
-        EIMSK |= 0b00100000;
-    }
-    else if(inter == 6){
-        EICRB = 0b00010000;
-        EIMSK |= 0b01000000;
-    }
-    else if(inter == 7){
-        EICRB = 0b01000000;
-        EIMSK |= 0b10000000;
-    }
+        TCCR3A = 0;
+        TCCR3B = 0;
+        TCNT3 = 3;
+        OCR3A = 1561;
+        TCCR3B |= (1<< WGM32);
+        TCCR3B |= (1<<CS32) | (1<<CS30);
+        TIMSK3 |= (1<<OCIE3A);
 }
