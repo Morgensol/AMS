@@ -175,33 +175,38 @@ void ITDB02::drawString(char* string, uint16_t length)
 
 Lines* ITDB02::splitString(char* string, uint16_t length)
 {
-    uint8_t numberOfLines = 0; 
-    uint16_t pixelsToDraw=0;
-    uint16_t pixelsToDrawCheck=0;
     uint16_t charsToDraw[12]={0};
-    uint8_t charsCounter=0;
-    for (uint16_t i = 0; i < length; i++)
-    {
-        pixelsToDraw+=TimesNewRomanFont[(uint8_t)string[i]]->width;
-        pixelsToDrawCheck+=TimesNewRomanFont[(uint8_t)string[i]]->width;
-        charsToDraw[charsCounter]++;
-        if ((pixelsToDrawCheck+TimesNewRomanFont[(uint8_t)string[i+1]]->width) > HORIZONTAL_MAX)
-        {
-            charsCounter++;
-            pixelsToDrawCheck=0;
-        }
-        
-    }
-    numberOfLines = (pixelsToDraw%HORIZONTAL_MAX)==0?pixelsToDraw/HORIZONTAL_MAX:(pixelsToDraw/HORIZONTAL_MAX)+1;
+    uint16_t pixelsToDraw=calculatePixelsAndCharsToDraw(charsToDraw,string,length);
+    uint8_t numberOfLines = (pixelsToDraw%HORIZONTAL_MAX)==0?pixelsToDraw/HORIZONTAL_MAX:(pixelsToDraw/HORIZONTAL_MAX)+1;
+
     Lines* returnObj= new Lines(80, numberOfLines);
     uint16_t startPos = 0;
+
     for ( uint16_t i=0; i < numberOfLines; i++)
     {
         returnObj->addLine(i, getNextString(string, charsToDraw[i], startPos));
-         startPos +=charsToDraw[i];
+        startPos +=charsToDraw[i];
     }
     
     return returnObj;
+}
+uint16_t ITDB02::calculatePixelsAndCharsToDraw(uint16_t* charsToDraw,char* string, uint16_t length)
+{
+    uint16_t TotalPixelsToDraw=0, tempPixels=0;
+    uint8_t charsCounter=0;
+    for (uint16_t i = 0; i < length; i++)
+    {
+        tempPixels+=characterWidth(string[i]);
+        TotalPixelsToDraw+=characterWidth(string[i]);
+        charsToDraw[charsCounter]++;
+        if ((tempPixels+characterWidth(string[i+1])) > HORIZONTAL_MAX)
+        {
+            charsCounter++;
+            tempPixels=0;
+        }
+        
+    }
+    return TotalPixelsToDraw;
 }
 
 void ITDB02::addLineToScreen(Line* lineToAdd)

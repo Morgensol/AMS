@@ -28,6 +28,7 @@ private:
     void moveScreenLinesUp();
     void drawLine(uint16_t lineNmbr);
     Lines* splitString(char* string, uint16_t length);
+    uint16_t calculatePixelsAndCharsToDraw(uint16_t* charsToDraw,char* string, uint16_t length);
 public:
     ITDB02();
     ~ITDB02();
