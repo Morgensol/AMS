@@ -1692,7 +1692,7 @@ struct ASCII _PERCENT = {.map=PERCENT,.width=13,.height=19};
 struct ASCII* TimesNewRomanFont[400]{&_SPACE};
 void setupTimesNewRoman(){
 
-    TimesNewRomanFont['A']=&_A;
+ TimesNewRomanFont['A']=&_A;
     TimesNewRomanFont['B']=&_B;
     TimesNewRomanFont['C']=&_C;
     TimesNewRomanFont['D']=&_D;
@@ -1719,7 +1719,7 @@ void setupTimesNewRoman(){
     TimesNewRomanFont['Y']=&_Y;
     TimesNewRomanFont['Z']=&_Z;
 
-    TimesNewRomanFont['a']=&_a;
+        TimesNewRomanFont['a']=&_a;
     TimesNewRomanFont['b']=&_b;
     TimesNewRomanFont['c']=&_c;
     TimesNewRomanFont['d']=&_d;
@@ -1747,11 +1747,11 @@ void setupTimesNewRoman(){
     TimesNewRomanFont['z']=&_z;
 
     TimesNewRomanFont['!']=&_EXCLAMAITON_MARK;
-    TimesNewRomanFont['%']=&_PERCENT;
-    TimesNewRomanFont[',']=&_COMMA;
-    TimesNewRomanFont['-']=&_DASH;
-    TimesNewRomanFont['.']=&_PERIOD;
-    TimesNewRomanFont['/']=&_FRONT_SLASH;
+    TimesNewRomanFont[37]=&_PERCENT;
+     TimesNewRomanFont[',']=&_COMMA;
+     TimesNewRomanFont['-']=&_DASH;
+     TimesNewRomanFont['.']=&_PERIOD;
+     TimesNewRomanFont['/']=&_FRONT_SLASH;
     TimesNewRomanFont['0']=&_ZERO;
     TimesNewRomanFont['1']=&_ONE;
     TimesNewRomanFont['2']=&_TWO;
@@ -1767,5 +1767,4 @@ void setupTimesNewRoman(){
     TimesNewRomanFont['=']=&_EQUAL;
     TimesNewRomanFont['?']=&_QUESTION_MARK;
     TimesNewRomanFont['_']=&_UNDERSCORE;
-    TimesNewRomanFont[' ']=&_SPACE;
 }

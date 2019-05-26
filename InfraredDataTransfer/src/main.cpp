@@ -7,7 +7,7 @@
 #include "IRReceiver.hpp"
 #include "ITDB02.hpp"
 #include "TempSensor.hpp"
-#define TEST
+#define SENDER
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -42,8 +42,6 @@ void loop() {
 	// display.FillRectangle(140,140,320-140,100,31,0,0);
   // uint32_t fwidth=0;
   char d[]={"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/.,-?!:;-_"};
-  char a[] = "12345678911131517";
-  char aa[] = "1234aaaaaaaa1517";
   char c[]={"Okay her er en histore om en dreng der hedder quang, han er 7 aar bor i tailand han staar tidligt op om morgenen og gaar meget sent i seng, for quang har nok at se til skoent han bare er en dreng, hver morgen kl kvart i 5 gaar quang alene ned\n"};
   // for (size_t i = 0; i < 26; i++)
   // {
@@ -58,123 +56,7 @@ void loop() {
   // display.drawASCII(TimesNewRomanFont['b'],0,311);
   // display.drawASCII(TimesNewRomanFont['c'],220,0);
   // display.drawASCII(TimesNewRomanFont['d'],220,311);
-  display.drawString(c,sizeof(c));
-  msleep(200);
-  display.drawString(a,sizeof(a));
-  msleep(200);
-  display.drawString(a,sizeof(a));
-    msleep(200);
-  display.drawString(a,sizeof(a));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-    msleep(200);
-  display.drawString(aa,sizeof(aa));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-    msleep(200);
-  display.drawString(aa,sizeof(aa));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-    msleep(200);
-  display.drawString(a,sizeof(a));
-  msleep(200);
-  display.drawString(a,sizeof(a));
-    msleep(200);
-  display.drawString(a,sizeof(a));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-    msleep(200);
-  display.drawString(aa,sizeof(aa));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-    msleep(200);
-  display.drawString(aa,sizeof(aa));
-  msleep(200);
-  display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(a,sizeof(a));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(a,sizeof(a));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(a,sizeof(a));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(a,sizeof(a));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(a,sizeof(a));
-  //   msleep(200);
-  // display.drawString(a,sizeof(a));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  //   msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  // msleep(200);
-  // display.drawString(aa,sizeof(aa));
-  
-  
-  Serial.write("Didnt crash");
-  //display.legacyWriteString(d,sizeof(d));
+  display.drawString(d,sizeof(d));
   //  display.drawString(c,sizeof(c));
   //  display.drawString(c,sizeof(d));
   // display.scrollText();
@@ -209,7 +91,6 @@ void loop() {
 
     #ifdef RECIEVER
     IRReturnData ReadData= reciever.Receive();
-    display.drawString((char*)"Recieved Message:\n",sizeof("Recieved Message:\n"));
     display.drawString(ReadData.streng,ReadData.length);
     delete[] ReadData.streng;
     #endif
