@@ -26,7 +26,7 @@ void loop() {
     #endif
 
     #ifdef RECIEVER
-    IRReceiver reciever = IRReceiver(true);
+    IRReceiver reciever = IRReceiver();
     ITDB02 display= ITDB02();
     #endif
     //Loop to run infinetly

@@ -59,61 +59,49 @@ ISR(TIMER3_COMPA_vect)
     counter = 0;
 }
 
-IRReceiver::IRReceiver(bool setup){
-    if(setup){
-        cli();
-        setupInterrupt();
-        TCCR3A = 0;
-        TCCR3B = 0;
-        TCNT3 = 3;
-        OCR3A = 1561;
-        TCCR3B |= (1<< WGM32);
-        TCCR3B |= (1<<CS32) | (1<<CS30);
-        TIMSK3 |= (1<<OCIE3A);
-        sei();
-    }
+IRReceiver::IRReceiver(){
+    cli();
+    setupInterrupt();
+    sei();
 }
 
 IRReceiver::~IRReceiver(){
     
 }
-
+uint32_t IRReceiver::readBuffer(uint8_t* output, uint32_t index)
+{
+    output[index]=buff;
+    buff=0;
+    buffcnt=0;
+    return 1;
+}
+uint32_t IRReceiver::calculateReadLength(uint8_t* array, uint32_t nmbrOfBytes)
+{
+    uint32_t calculatedLength=0;
+    for (uint32_t byte = 0; byte < nmbrOfBytes; byte++)
+    {
+        calculatedLength+=(uint32_t)array[byte]<<(byte*8);
+    }
+    return calculatedLength;
+}
 IRReturnData IRReceiver::Receive(){
-    while(!trig)
-    { 
-    }   
     uint8_t checksum[4];
     uint8_t length[4];
     volatile uint8_t lengthCheck = 0;
-    while (lengthCheck<4)
-    {
-        if(buffcnt == 8){
-            checksum[lengthCheck] = buff;
-            lengthCheck++;
-            buff = 0;
-            buffcnt = 0;
-        }
-    }
+
+    while(!trig); //Wait here untill the data sequence is started
+
+    while (lengthCheck<4) //Read checksum
+        if(buffcnt == 8) lengthCheck += readBuffer(checksum,lengthCheck);
 
     lengthCheck = 0;
-    while (lengthCheck<4)
-    {
-        if(buffcnt == 8){
-            length[lengthCheck] = buff;
-            lengthCheck++;
-            buff = 0;
-            buffcnt = 0;
-        }
-    }
-
-    uint32_t arrayLen=0;
-    arrayLen=length[0]+((uint32_t)length[1]<<8)+((uint32_t)length[2]<<16)+((uint32_t)length[3]<<24);
-
     
-     IRReturnData ret={
-        .length=arrayLen,
-        .streng = new volatile char[arrayLen]
-    };
+    while (lengthCheck<4) //Read length
+        if(buffcnt == 8) lengthCheck += readBuffer(length,lengthCheck);
+
+    uint32_t arrayLen=calculateReadLength(length,4);
+
+    IRReturnData ret = {.length = arrayLen, .streng = new volatile char[arrayLen]};
     
     volatile uint32_t index = 0;
     uint32_t Cmpchecksum =0;
@@ -158,4 +146,11 @@ IRReturnData IRReceiver::Receive(){
 void IRReceiver::setupInterrupt(){
     EICRA = 0b00000001;
     EIMSK |= 0b00000001;
+    TCCR3A = 0;
+    TCCR3B = 0;
+    TCNT3 = 3;
+    OCR3A = 1561;
+    TCCR3B |= (1<< WGM32);
+    TCCR3B |= (1<<CS32) | (1<<CS30);
+    TIMSK3 |= (1<<OCIE3A);
 }

@@ -10,8 +10,10 @@ class IRReceiver{
 private:
 int frequence = 0;
 CTCTimer* _timer =NULL;
+uint32_t readBuffer(uint8_t* output, uint32_t index);
+uint32_t calculateReadLength(uint8_t* array, uint32_t nmbrOfBytes);
 public:
-IRReceiver(bool setup);
+IRReceiver();
 ~IRReceiver();
 void setupInterrupt();
 IRReturnData Receive();
