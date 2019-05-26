@@ -22,6 +22,9 @@ ISR(INT0_vect)
     {
         unsigned long treT = timestamp[1]-timestamp[0];
         Time = timestamp[2]-timestamp[1];
+        // char c[100];
+        // snprintf(c,100,"T: %lu treT: %lu timestamp1: %lu timestamp2: %lu timestamp3: %lu",T,treT, timestamp[0],timestamp[1], timestamp[2]);
+        // Serial.write(c);
         if((double)Time*3>(double)treT*0.85 && (double)treT*1.15>(double)Time*3){
             trig = true; 
             Time = (Time+treT)>>1;
@@ -57,6 +60,36 @@ ISR(INT0_vect)
 ISR(TIMER3_COMPA_vect)
 {
     counter = 0;
+}
+
+ISR(INT2_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
+}
+
+ISR(INT3_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
+}
+
+ISR(INT4_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
+}
+
+ISR(INT5_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
+}
+
+ISR(INT6_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
+}
+
+ISR(INT7_vect)
+{
+    Serial.write("Not configured to receive data \n\r");
 }
 
 IRReceiver::IRReceiver(int inter, bool setup){

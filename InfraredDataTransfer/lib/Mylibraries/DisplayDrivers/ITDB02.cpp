@@ -102,9 +102,12 @@ void ITDB02::MemoryWrite()
 }
 
 // Red 0-31, Green 0-63, Blue 0-31
-void ITDB02::WritePixel(Color rgb)
+void ITDB02::WritePixel(uint8_t Red, uint8_t Green, uint8_t Blue)
 {
-    WriteData((uint16_t)rgb.getRed()<<11 | (uint16_t)rgb.getGreen()<<5 | (uint16_t)rgb.getBlue());		
+	if((Red < 32) && (Green < 64) && (Blue <32))
+	{
+		WriteData((uint16_t)Red<<11 | (uint16_t)Green<<5 | (uint16_t)Blue);		
+	}
 }
 
 // Set Column Address (0-239), Start > End
@@ -139,7 +142,7 @@ void ITDB02::FillRectangle(uint16_t StartX, uint16_t StartY, uint16_t Width, uin
 		
 	for(uint32_t t = 0; t < (uint32_t)Width * (uint32_t)Height; t++)
 	{
-		WritePixel(rgb);
+		WritePixel(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
 	}
 }
 void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
@@ -154,11 +157,11 @@ void ITDB02::drawASCII(ASCII* character,uint16_t StartX, uint16_t StartY)
         {
             if ((character->map[pixel]&(1<<((character->width-1)-column))))
             {
-                WritePixel(Color(BLACK)); //black
+                WritePixel(0,0,0); //black
             }
             else
             {
-                WritePixel(Color(WHITE)); //white
+                WritePixel(31,63,31); //white
             }     
         }
         
@@ -179,30 +182,36 @@ void ITDB02::drawString(char* string, uint16_t length)
 
 Lines* ITDB02::splitString(char* string, uint16_t length)
 {
-    uint8_t numberOfLines = 0;
-    uint16_t TotalPixelCount=0;
-    uint16_t LinePixelCount=0;
+    char c[50];
+    uint8_t numberOfLines = 0; // vurder om ekstra linje ved præcis skal fixes
+    uint16_t pixelsToDraw=0;
+    uint16_t pixelsToDrawCheck=0;
     uint16_t charsToDraw[12]={0};
     uint8_t charsCounter=0;
     for (uint16_t i = 0; i < length; i++)
     {
-        LinePixelCount+=getCharWidth(string[i]);
+        pixelsToDraw+=TimesNewRomanFont[(uint8_t)string[i]]->width;
+        pixelsToDrawCheck+=TimesNewRomanFont[(uint8_t)string[i]]->width;
         charsToDraw[charsCounter]++;
-        if ((LinePixelCount+getCharWidth(string[i])) > HORIZONTAL_MAX)
+        if ((pixelsToDrawCheck+TimesNewRomanFont[(uint8_t)string[i+1]]->width) > HORIZONTAL_MAX)
         {
             charsCounter++;
-            TotalPixelCount+=LinePixelCount;
-            LinePixelCount=0;
+            pixelsToDrawCheck=0;
         }
         
     }
-    numberOfLines = (TotalPixelCount%HORIZONTAL_MAX)==0?TotalPixelCount/HORIZONTAL_MAX:(TotalPixelCount/HORIZONTAL_MAX)+1;
+    Serial.write("W");
+    numberOfLines = (pixelsToDraw%HORIZONTAL_MAX)==0?pixelsToDraw/HORIZONTAL_MAX:(pixelsToDraw/HORIZONTAL_MAX)+1;
+    snprintf(c,50,"lines: %u, pixels: %u ",numberOfLines, pixelsToDraw);
+    Serial.write(c);
     Lines* returnObj= new Lines(80, numberOfLines);
     uint16_t startPos = 0;
     for ( uint16_t i=0; i < numberOfLines; i++)
     {
+        snprintf(c,50,"charsToDraw[%u] = %u ",i,charsToDraw[i]);
+        Serial.write(c);
         returnObj->addLine(i, getNextString(string, charsToDraw[i], startPos));
-        startPos +=charsToDraw[i];
+         startPos +=charsToDraw[i];
     }
     
     return returnObj;
@@ -226,12 +235,12 @@ Line* ITDB02::getNextString(char* string, uint16_t maxLineLength, uint16_t start
 
 void ITDB02::drawScreen()
 {
-    Y_pos=0;
+    CurrentRow=0;
     for (uint16_t i = 0; i < Screen->getMaxLines(); i++)
     {
-        X_pos = 0;
+        CurrentCol = 0;
         drawLine(i);
-        Y_pos+=getCharHeight('A');  
+        CurrentRow+=characterHeigth('A');  
     }
 }
 
@@ -241,8 +250,8 @@ void ITDB02::drawLine(uint16_t lineNmbr)
 
     for (uint8_t i = 0; i < tempLine->getLength(); i++)
     {
-        drawASCII(TimesNewRomanFont[(uint8_t)tempLine->getChar(i)],Y_pos,X_pos);
-        X_pos+=getCharWidth(tempLine->getChar(i));
+        drawASCII(TimesNewRomanFont[(uint8_t)tempLine->getChar(i)],CurrentRow,CurrentCol);
+        CurrentCol+=characterWidth(tempLine->getChar(i));
     }
     delete tempLine;
 }
@@ -253,13 +262,103 @@ void ITDB02::moveScreenLinesUp()
         Screen->addLine(i,Screen->getLine(i+1));
     
 }
+void ITDB02::legacyWriteString(char* string, uint16_t length)
+{
+    for (size_t i = 0; i < length-1; i++)   //Why -1?
+    {
+        
+        if(string[i]=='\n')
+            handleEndLine();
 
-uint16_t ITDB02::getCharWidth(char character)
+        else if(tooManyCharacters(string[i]))
+        {
+            if(tooManyLines(string[i]))
+                resetCurser();
+            else
+                newLine(string[i]); //The way we calculate a new line, if a more complicated program is written, will need to be calculated from the largest character in that line
+            
+            addNewCharacter(string[i], i);
+            CurrentCol += characterWidth(string[i]);
+        } 
+        else
+        {
+            addNewCharacter(string[i], i);
+            CurrentCol += characterWidth(string[i]);
+        }
+    }
+}
+
+void ITDB02::handleEndLine()
+{
+    if(tooManyLines('A'))
+        resetCurser();
+    else
+        newLine('A');
+}
+
+int ITDB02::characterWidth(char character)
 {
     return TimesNewRomanFont[(uint8_t)character]->width;
 }
 
-uint16_t ITDB02::getCharHeight(char character)
+int ITDB02::characterHeigth(char character)
 {
     return TimesNewRomanFont[(uint8_t)character]->height;
+}
+
+bool ITDB02::tooManyCharacters(char character)
+{
+    return CurrentCol+characterWidth(character) >= HORIZONTAL_MAX;
+}
+
+bool ITDB02::tooManyLines(char character)
+{
+    return CurrentRow+characterHeigth(character) > (VERTICAL_MAX-19);
+}
+
+void ITDB02::resetCurser()
+{
+    resetLines();
+    resetLine();
+}
+
+void ITDB02::newLine(char character)
+{
+    CurrentRow += characterHeigth(character);
+    resetLine();
+}
+
+void ITDB02::resetLines()
+{
+    CurrentRow=0;
+}
+
+void ITDB02::resetLine()
+{
+    CurrentCol=0;
+}
+
+void ITDB02::addNewCharacter(char character, int index)
+{
+    drawASCII(TimesNewRomanFont[(uint8_t)character],CurrentRow,CurrentCol);
+    //DrawnLines[CurrentRow/19].string[index] = character;
+    //DrawnLines[CurrentRow/19].current_length++;
+}
+
+void ITDB02::scrollText()
+{
+    Color rgb(WHITE);
+    FillRectangle(0,0,320,240,rgb);
+    CurrentCol=0;
+    CurrentRow=0;
+    for (size_t lines = 0; lines < 12; lines++)
+    {
+        for (size_t character = 0; character < DrawnLines[lines].current_length; character++)
+        {
+            drawASCII(TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]],CurrentRow,CurrentCol);
+            CurrentCol+=TimesNewRomanFont[(uint8_t)DrawnLines[lines].string[character]]->width;
+        }
+        
+    }
+    
 }
