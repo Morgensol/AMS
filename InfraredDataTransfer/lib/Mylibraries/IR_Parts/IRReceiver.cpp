@@ -57,6 +57,7 @@ ISR(INT0_vect)
 ISR(TIMER3_COMPA_vect)
 {
     counter = 0;
+    trig=false;
 }
 
 IRReceiver::IRReceiver(){
@@ -75,7 +76,7 @@ uint32_t IRReceiver::readBuffer(uint8_t* output, uint32_t index)
     buffcnt=0;
     return 1;
 }
-uint32_t IRReceiver::calculateReadLength(uint8_t* array, uint32_t nmbrOfBytes)
+uint32_t IRReceiver::calculateOriginal(uint8_t* array, uint32_t nmbrOfBytes)
 {
     uint32_t calculatedLength=0;
     for (uint32_t byte = 0; byte < nmbrOfBytes; byte++)
@@ -87,59 +88,46 @@ uint32_t IRReceiver::calculateReadLength(uint8_t* array, uint32_t nmbrOfBytes)
 IRReturnData IRReceiver::Receive(){
     uint8_t checksum[4];
     uint8_t length[4];
-    volatile uint8_t lengthCheck = 0;
+    uint8_t index = 0;
 
     while(!trig); //Wait here untill the data sequence is started
 
-    while (lengthCheck<4) //Read checksum
-        if(buffcnt == 8) lengthCheck += readBuffer(checksum,lengthCheck);
+    while (index<4 && trig) //Read checksum
+        if(buffcnt == 8) index += readBuffer(checksum,index);
 
-    lengthCheck = 0;
+    index = 0;
     
-    while (lengthCheck<4) //Read length
-        if(buffcnt == 8) lengthCheck += readBuffer(length,lengthCheck);
+    while (index<4 && trig) //Read length
+        if(buffcnt == 8) index += readBuffer(length,index);
 
-    uint32_t arrayLen=calculateReadLength(length,4);
+    index = 0;
+    uint32_t arrayLen=calculateOriginal(length,4);
 
-    IRReturnData ret = {.length = arrayLen, .streng = new volatile char[arrayLen]};
-    
-    volatile uint32_t index = 0;
+    IRReturnData ret = {.length = arrayLen, .streng = new uint8_t[arrayLen]};
+
     uint32_t Cmpchecksum =0;
     while(trig){
         if(buffcnt == 8)
         {
-            ret.streng[index]=buff;
+            readBuffer(ret.streng,index);
             Cmpchecksum += ret.streng[index];
             index++;
-            buffcnt = 0;
-            buff = 0;
         }
-        if(index == arrayLen){
+        if(index == arrayLen){ //Once the length is reached, end reading
             trig = false;
             counter=0;
         }
     }
-    TIMSK3 |= (1<<OCIE3A);
 
-    uint32_t arrayChecksum=0;
-    arrayChecksum=checksum[0]+((uint32_t)checksum[1]<<8)+((uint32_t)checksum[2]<<16)+((uint32_t)checksum[3]<<24);
+    TIMSK3 |= (1<<OCIE3A);  //Disable the timer that resets the reading process
 
-    if(arrayChecksum != Cmpchecksum)
+    uint32_t arrayChecksum = calculateOriginal(checksum,4);
+
+    if(arrayChecksum != Cmpchecksum) //Check if data is corrupt
     {
         Serial.write("Data corrupted");
-    }
-
-    else{
-        char d[100];
-        cli();
-        for (size_t i = 0; i < arrayLen; i++)
-        {
-            snprintf(d, 100, "%c" ,ret.streng[i]);
-            Serial.write(d);
-        }
-        Serial.write("\n\r");
-
-        sei();
+        snprintf((char*)ret.streng,sizeof("Data corrupted"),"Data corrupted");
+        ret.length=sizeof("Data corrupted");
     }
     return ret;
 }
