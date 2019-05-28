@@ -82,6 +82,7 @@ uint32_t IRReceiver::calculateOriginal(uint8_t* array, uint32_t nmbrOfBytes)
     }
     return calculatedLength;
 }
+
 IRReturnData IRReceiver::Receive(){
     uint8_t checksum[4];
     uint8_t length[4];
@@ -117,7 +118,7 @@ IRReturnData IRReceiver::Receive(){
     }
 
     TIMSK3 |= (1<<OCIE3A);  //Disable the timer that resets the reading process
-
+    
     uint32_t arrayChecksum = calculateOriginal(checksum,4);
 
     if(arrayChecksum != Cmpchecksum) //Check if data is corrupt
